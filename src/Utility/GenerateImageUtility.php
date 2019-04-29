@@ -107,16 +107,17 @@ class GenerateImageUtility {
         return $path . '/' . $file;
     }
 
+    // @todo Cache id for filenames
     public function getTextFilename(string $mimeType = 'image/jpeg'): string {
         $extension = FileUtility::getFileExtensionByMimeType($mimeType);
-        return $this->type . '_' . $this->getWidth(). 'x' . $this->getHeight(). '.' . $extension;
+        return $this->type . '_' . $this->getWidth() . 'x' . $this->getHeight() . '_' . rand(1, 1000000) . '.' . $extension;
     }
 
+    // @todo Cache id for filenames
     public function getImageFilename(string $mimeType = 'image/jpeg'): string {
         $extension = FileUtility::getFileExtensionByMimeType($mimeType);
-        return $this->type . '_' . $this->getWidth(). 'x' . $this->getHeight(). '.' . $extension;
+        return $this->type . '_' . $this->getWidth() . 'x' . $this->getHeight() . '_' . rand(1, 1000000) . '.' . $extension;
     }
-
 
     /**
      * @param string $text
