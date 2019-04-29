@@ -34,3 +34,12 @@ yarn build
 # Development
 yarn build:dev
 ```
+
+### Error pages
+
+Add to url `/_error/number` .
+
+```bash
+/_error/404
+/_error/500
+```
