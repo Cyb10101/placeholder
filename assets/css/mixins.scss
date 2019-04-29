@@ -1,0 +1,44 @@
+// @include clearfix();
+@mixin clearfix() {
+    &:after {
+        content: ".";
+        clear: both;
+        display: block;
+        visibility: hidden;
+        height: 0;
+    }
+}
+
+// @include user-select(none);
+@mixin user-select($val) {
+    -webkit-touch-callout: $val;
+    -webkit-user-select: $val;
+    -khtml-user-select: $val;
+    -moz-user-select: $val;
+    -ms-user-select: $val;
+    user-select: $val;
+}
+
+// @include transition(transition);
+@mixin transition($arguments) {
+    -webkit-transition: $arguments;
+    -moz-transition: $arguments;
+    -ms-transition: $arguments;
+    -o-transition: $arguments;
+    transition: $arguments;
+}
+
+// @include size(300, 300);
+@mixin size($width, $height) {
+    width: $width;
+    height: $height;
+}
+
+// calcMultiply(2, 3)
+@function calcMultiply($value1, $value2) {
+    $calc: 0;
+    @for $i from 1 through $value2 {
+        $calc: $calc + $value1;
+    }
+    @return $calc;
+}

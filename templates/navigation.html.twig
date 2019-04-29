@@ -1,0 +1,6 @@
+<li class="nav-item{% if app.request.get('_route') == 'root' %} active{% endif %}">
+    <a class="nav-link" href="{{ path('root') }}">Home</a>
+</li>
+<li class="nav-item{% if app.request.get('_route') == 'contact' %} active{% endif %}">
+    <a class="nav-link" href="{{ path('contact') }}">Contact</a>
+</li>

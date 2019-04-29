@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>{% block title %}Placeholder{% endblock %}</title>
+    <meta name="description" content="{% block metaDescription %}Netslum: Placeholder{% endblock %}">
+
+    <link rel="stylesheet" href="/build/app.css" media="all">
+    <script src="/build/app.js"></script>
+
+
+    {% if app.environment == 'prod' %}
+        {# @todo Analytics?
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-123-0"></script>
+        <script src="/includes/google-analytics.js"></script>
+         #}
+    {% endif %}
+
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
+
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{{ block('title') }}">
+    <meta property="og:description" content="{{ block('metaDescription') }}">
+    <meta property="og:url" content="{{ app.request.getSchemeAndHttpHost() }}{% block metaOgUrl %}{{ path('root') }}{% endblock %}">
+    {# @todo OG Logo #}
+    <meta property="og:image" content="{{ app.request.getSchemeAndHttpHost() }}{% block metaOgImage %}/images/logo.jpg{% endblock %}">
+    <meta property="og:image:width" content="{% block metaOgImageWidth %}1200{% endblock %}">
+    <meta property="og:image:height" content="{% block metaOgImageHeight %}630{% endblock %}">
+
+    {% block head %}{% endblock %}
+</head>
+<body>
+<nav class="navbar {% if forceMobileNavigation is not defined %}navbar-expand-lg{% endif %} fixed-top navbar-dark bg-dark">
+    <div class="container">
+        <a href="{{ path('root') }}" class="navbar-brand">
+            <img src="/images/logo.jpg" class="d-inline-block align-top" title="Netslum Logo">
+        </a>
+
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        {# @todo scrollable-menu #}
+        <div class="collapse navbar-collapse scrollable-menu" id="navbarNav">
+
+            <ul class="navbar-nav mr-auto">
+                {% include 'navigation.html.twig' %}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container page">
+    <div class="row">
+        <div id="content" class="col-md-12">
+            {% block body %}{% endblock %}
+        </div>
+    </div>
+</div>
+
+<footer class="bg-dark text-white">
+    &copy; Cyb10101 {{ 'now'|date('Y') }}
+</footer>
+<script src="/build/appFooter.js"></script>
+</body></html>

@@ -1,0 +1,40 @@
+version: '3.5'
+
+services:
+  web:
+    image: pluswerk/php-dev:nginx-7.2
+
+    volumes:
+      - .:/app
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ~/.ssh:/home/application/.ssh:ro
+      - ~/.composer/cache:/home/application/.composer/cache
+      - ~/.gitconfig:/home/application/.gitconfig:ro
+
+    environment:
+      - VIRTUAL_HOST=~^placeholder\.netslum\.(vm|vmd)$$
+      - VIRTUAL_PROTO=https
+      - VIRTUAL_PORT=443
+
+      - WEB_DOCUMENT_ROOT=/app/public
+      - php.error_reporting=32767
+      - php.display_errors=1
+      - php.session.gc_maxlifetime=86400
+
+      # SSL: Use default cert from global-nginx-proxy
+      - CERT_NAME=default
+      # SSL: Do not a redirect in global-nginx-proxy, if you use another port than 443
+      - HTTPS_METHOD=noredirect
+    working_dir: /app
+
+  node:
+    image: node:lts
+    volumes:
+      - ./:/app
+    working_dir: /app
+    command: tail -f /dev/null
+
+networks:
+  default:
+    external:
+      name: global
