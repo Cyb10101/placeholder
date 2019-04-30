@@ -52,8 +52,8 @@ class ImageController extends AbstractController {
      * @Route("/image/{format}.{extension}", name="image_format_extension")
      * @Route("/image/{format}", name="image_format")
      */
-    public function image(string $format, string $category = '', string $forecolor = '', string $extension = '') {
-        return $this->file($this->getProjectDirectory() . '/public/images/logo.jpg', 'Logo.jpg', ResponseHeaderBag::DISPOSITION_INLINE);
+    public function image(Request $request, string $format, string $category = '', string $forecolor = '', string $extension = '') {
+//        return $this->file($this->getProjectDirectory() . '/public/images/logo.jpg', 'Logo.jpg', ResponseHeaderBag::DISPOSITION_INLINE);
 
         // @todo Generate image
         $generateImageUtility = new \App\Utility\GenerateImageUtility($this->getDoctrine(), $this->getProjectDirectory());

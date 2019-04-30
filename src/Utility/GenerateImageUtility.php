@@ -4,6 +4,7 @@ namespace App\Utility;
 use App\Entity\Font;
 use App\Entity\Format;
 use App\Entity\Image;
+use App\Repository\ImageRepository;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 
 /**
@@ -16,6 +17,11 @@ class GenerateImageUtility {
      * @var Registry
      */
     protected $doctrine = null;
+
+    /**
+     * @var ImageRepository
+     */
+    protected $imageRepository = null;
 
     /**
      * @var string
@@ -54,6 +60,104 @@ class GenerateImageUtility {
 
         return $this;
     }
+
+    /**
+     * @param string $file
+     * @return void
+     * @todo In development
+     */
+    public function createImageFromFile($file) {
+        $this->sourceFile = $file;
+        $this->targetMime = FileUtility::getMimeTypeByFileExtension($file);
+
+        $fileType = FileUtility::getMimeTypeByFilename($file);
+        switch($fileType) {
+            case 'image/jpeg': $this->image = imagecreatefromjpeg($file); break;
+            case 'image/png': $this->image = imagecreatefrompng($file); break;
+            case 'image/gif': $this->image = imagecreatefromgif($file); break;
+            default:
+                throw new \Exception('Create image from file failed!');
+        }
+    }
+
+    /**
+     * @return self
+     * @todo In development
+     */
+    public function createImage() {
+        $imageFile = null;
+        /** @var \AppBundle\Entity\Image $image */
+        $image = $this->imageRepository->findOneRandom($this->getCategory());
+        $imageFile =  $this->pathImages . '/' . $image->getCategory() . '/' . $image->getFile();
+
+        if ($imageFile !== null) {
+            $this->createImageFromFile($imageFile);
+            $this->shrinkAndCut($this->getWidth(), $this->getHeight());
+        }
+
+
+
+        if (!function_exists('imagecreate')) {
+            throw new \Exception('Can\'t create new GD-Image-Stream!');
+        }
+        $this->image = @imagecreate($this->getWidth(), $this->getHeight());
+
+        // Background
+        $backgroundColor = ConvertUtility::colorHexToRgb($this->getBackgroundColor());
+        if (!GeneralUtility::isColorRGB($backgroundColor)) {
+            $backgroundColor = [200, 200, 200];
+        }
+        imagecolorallocate($this->image, $backgroundColor[0], $backgroundColor[1], $backgroundColor[2]);
+
+        return $this;
+    }
+
+    /**
+     * @param int $width
+     * @param int $height
+     * @return void
+     * @todo In development
+     */
+    public function shrinkAndCut($width = 400, $height = 400) {
+        $sourceWidth = imagesx($this->image);
+        $sourceHeight = imagesy($this->image);
+
+        $resize = CalculationUtility::calcShrinkBoxCover($sourceWidth, $sourceHeight, $width, $height);
+
+        $shrinkImage = imagecreatetruecolor($resize->width, $resize->height);
+        if ($shrinkImage !== false) {
+            $this->setImageTransparent($shrinkImage, $this->targetMime);
+            imagecopyresampled($shrinkImage, $this->image, 0, 0, 0, 0, $resize->width, $resize->height, $sourceWidth, $sourceHeight);
+
+            $cutImage = imagecreatetruecolor($width, $height);
+            if ($shrinkImage !== false) {
+                $gap = CalculationUtility::calcGap($resize->width, $resize->height, $width, $height);
+                $this->setImageTransparent($cutImage, $this->targetMime);
+                imagecopyresampled($cutImage, $shrinkImage, 0, 0, $gap->width, $gap->height, $width, $height, $width, $height);
+
+                imagedestroy($this->image);
+                $this->image = $cutImage;
+            }
+            imagedestroy($shrinkImage);
+        }
+    }
+
+    /**
+     * @param resource $image
+     * @param string $fileType
+     * @return void
+     * @todo In development
+     */
+    protected function setImageTransparent(&$image, $fileType) {
+        if ($fileType === 'image/png' || $fileType === 'image/gif') {
+            imagealphablending($image, false);
+            imagesavealpha($image, true);
+
+            $color = imagecolorallocatealpha($image, 0, 0, 0, 127);
+            imagefill($image, 0, 0, $color);
+        }
+    }
+
 
     /**
      * @return self
