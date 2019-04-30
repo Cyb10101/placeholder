@@ -50,7 +50,7 @@ class ImageController extends AbstractController {
                     @import url('https://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic');
                 </style>
             </defs>
-            <rect x="2" y="2" width="<?php echo ($generateImageUtility->getWidth() - $generateImageUtility->getBorder()); ?>" height="<?php echo ($generateImageUtility->getHeight() - $generateImageUtility->getBorder()); ?>" style="fill:<?php echo $generateImageUtility->getBackgroundColor(); ?>;stroke:<?php echo $generateImageUtility->getForegroundColor(); ?>;stroke-width:<?php echo $generateImageUtility->getBorder(); ?>"/>
+            <rect x="0" y="0" width="<?php echo $generateImageUtility->getWidth(); ?>" height="<?php echo $generateImageUtility->getHeight(); ?>" style="fill:<?php echo $generateImageUtility->getBackgroundColor(); ?>;stroke:<?php echo $generateImageUtility->getForegroundColor(); ?>;stroke-width:<?php echo ($generateImageUtility->getBorder() * 2); ?>"/>
             <text x="50%" y="50%" font-size="<?php echo $fontSize; ?>px" text-anchor="middle" dominant-baseline="middle" font-family="Roboto, monospace, sans-serif" fill="<?php echo $generateImageUtility->getForegroundColor(); ?>">
                 <?php echo $generateImageUtility->getWidth(); ?>×<?php echo $generateImageUtility->getHeight(); ?>
             </text>
