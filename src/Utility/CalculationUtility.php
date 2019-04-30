@@ -12,7 +12,6 @@ abstract class CalculationUtility {
      * @param $height
      * @param int $saveOriginal
      * @return \stdClass
-     * @todo In development
      */
     public static function calcShrinkBox($originalWidth, $originalHeight, $width, $height, $saveOriginal = 0) {
         if ($saveOriginal === 1 AND (($height > $originalHeight) OR ($width > $originalWidth))) {
@@ -36,7 +35,6 @@ abstract class CalculationUtility {
      * @param $width
      * @param $height
      * @return \stdClass
-     * @todo In development
      */
     public static function calcShrinkBoxCover($originalWidth, $originalHeight, $width, $height) {
         $newWidth = $height / $originalHeight * $originalWidth;
@@ -59,7 +57,6 @@ abstract class CalculationUtility {
      * @param $width
      * @param $height
      * @return \stdClass
-     * @todo In development
      */
     public function calcGap($originalWidth, $originalHeight, $width, $height) {
         $gapWidth = 0; $gapHeight = 0;

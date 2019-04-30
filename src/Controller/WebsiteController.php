@@ -3,8 +3,10 @@ namespace App\Controller;
 
 use App\Entity\Font;
 use App\Entity\Format;
+use App\Entity\Image;
 use App\Repository\FontRepository;
 use App\Repository\FormatRepository;
+use App\Repository\ImageRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -18,6 +20,8 @@ class WebsiteController extends AbstractController {
         $fontRepository = $this->getDoctrine()->getRepository(Font::class);
         /** @var FormatRepository $formatRepository */
         $formatRepository = $this->getDoctrine()->getRepository(Format::class);
+        /** @var ImageRepository $imageRepository */
+        $imageRepository = $this->getDoctrine()->getRepository(Image::class);
 
         $fontAllowed = [];
         /** @var Font $font */
@@ -25,8 +29,7 @@ class WebsiteController extends AbstractController {
             $fontAllowed[] = $font->getKey();
         }
 
-        //$imageCategories = implode(', ', $this->imageRepository->getCategories());
-        $imageCategories = implode(', ', ['one', 'two']); // @todo Develop categories
+        $imageCategories = implode(', ', $imageRepository->getCategories());
         $parameter = [
             'format' => 'Width x height (400x300), only width for square (400) or a format (vga). See below under format table.',
             'text' => 'Text shown in image. If text is empty, "width x height" will be shown.',

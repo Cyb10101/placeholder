@@ -25,8 +25,6 @@ trait ImageConfigurationTrait {
      */
     protected $formatRepository = null;
 
-
-
     /**
      * @var resource
      */

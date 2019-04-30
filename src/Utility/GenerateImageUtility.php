@@ -33,6 +33,11 @@ class GenerateImageUtility {
      */
     protected $pathFonts = 'public/fonts';
 
+    /**
+     * @var string
+     */
+    protected $pathImages = 'public/images/categories';
+
     public function __construct(Registry $doctrine, string $projectDirectory) {
         $this->doctrine = $doctrine;
         $this->projectDirectory = $projectDirectory;
@@ -62,13 +67,27 @@ class GenerateImageUtility {
     }
 
     /**
+     * @return self
+     */
+    public function createImage() {
+        $imageFile = null;
+        /** @var \App\Entity\Image $image */
+        $image = $this->imageRepository->findOneRandom($this->getCategory());
+        $imageFile = $this->projectDirectory . '/' . $this->pathImages . '/' . $image->getCategory() . '/' . $image->getFile();
+
+        if ($imageFile !== null) {
+            $this->createImageFromFile($imageFile);
+            $this->shrinkAndCut($this->getWidth(), $this->getHeight());
+        }
+        return $this;
+    }
+
+    /**
      * @param string $file
      * @return void
-     * @todo In development
      */
     public function createImageFromFile($file) {
-        $this->sourceFile = $file;
-        $this->targetMime = FileUtility::getMimeTypeByFileExtension($file);
+        $this->setMimeType(FileUtility::getMimeTypeByFileExtension($file));
 
         $fileType = FileUtility::getMimeTypeByFilename($file);
         switch($fileType) {
@@ -81,42 +100,9 @@ class GenerateImageUtility {
     }
 
     /**
-     * @return self
-     * @todo In development
-     */
-    public function createImage() {
-        $imageFile = null;
-        /** @var \AppBundle\Entity\Image $image */
-        $image = $this->imageRepository->findOneRandom($this->getCategory());
-        $imageFile =  $this->pathImages . '/' . $image->getCategory() . '/' . $image->getFile();
-
-        if ($imageFile !== null) {
-            $this->createImageFromFile($imageFile);
-            $this->shrinkAndCut($this->getWidth(), $this->getHeight());
-        }
-
-
-
-        if (!function_exists('imagecreate')) {
-            throw new \Exception('Can\'t create new GD-Image-Stream!');
-        }
-        $this->image = @imagecreate($this->getWidth(), $this->getHeight());
-
-        // Background
-        $backgroundColor = ConvertUtility::colorHexToRgb($this->getBackgroundColor());
-        if (!GeneralUtility::isColorRGB($backgroundColor)) {
-            $backgroundColor = [200, 200, 200];
-        }
-        imagecolorallocate($this->image, $backgroundColor[0], $backgroundColor[1], $backgroundColor[2]);
-
-        return $this;
-    }
-
-    /**
      * @param int $width
      * @param int $height
      * @return void
-     * @todo In development
      */
     public function shrinkAndCut($width = 400, $height = 400) {
         $sourceWidth = imagesx($this->image);
@@ -126,13 +112,13 @@ class GenerateImageUtility {
 
         $shrinkImage = imagecreatetruecolor($resize->width, $resize->height);
         if ($shrinkImage !== false) {
-            $this->setImageTransparent($shrinkImage, $this->targetMime);
+            $this->setImageTransparent($shrinkImage, $this->getMimeType());
             imagecopyresampled($shrinkImage, $this->image, 0, 0, 0, 0, $resize->width, $resize->height, $sourceWidth, $sourceHeight);
 
             $cutImage = imagecreatetruecolor($width, $height);
             if ($shrinkImage !== false) {
                 $gap = CalculationUtility::calcGap($resize->width, $resize->height, $width, $height);
-                $this->setImageTransparent($cutImage, $this->targetMime);
+                $this->setImageTransparent($cutImage, $this->getMimeType());
                 imagecopyresampled($cutImage, $shrinkImage, 0, 0, $gap->width, $gap->height, $width, $height, $width, $height);
 
                 imagedestroy($this->image);
@@ -146,7 +132,6 @@ class GenerateImageUtility {
      * @param resource $image
      * @param string $fileType
      * @return void
-     * @todo In development
      */
     protected function setImageTransparent(&$image, $fileType) {
         if ($fileType === 'image/png' || $fileType === 'image/gif') {
@@ -157,7 +142,6 @@ class GenerateImageUtility {
             imagefill($image, 0, 0, $color);
         }
     }
-
 
     /**
      * @return self
