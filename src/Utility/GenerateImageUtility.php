@@ -3,6 +3,7 @@ namespace App\Utility;
 
 use App\Entity\Font;
 use App\Entity\Format;
+use App\Entity\Image;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 
 /**
@@ -32,6 +33,7 @@ class GenerateImageUtility {
 
         $this->fontRepository = $this->doctrine->getRepository(Font::class);
         $this->formatRepository = $this->doctrine->getRepository(Format::class);
+        $this->imageRepository = $this->doctrine->getRepository(Image::class);
     }
 
     /**

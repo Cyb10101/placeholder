@@ -3,9 +3,12 @@ namespace App\Traits;
 
 use App\Entity\Font;
 use App\Entity\Format;
+use App\Entity\Image;
 use App\Repository\FontRepository;
 use App\Repository\FormatRepository;
+use App\Repository\ImageRepository;
 use App\Utility\FileUtility;
+use App\Utility\GeneralUtility;
 use App\Utility\RequestUtility;
 
 /**
@@ -21,6 +24,11 @@ trait ImageConfigurationTrait {
      * @var FormatRepository
      */
     protected $formatRepository = null;
+
+    /**
+     * @var ImageRepository
+     */
+    protected $imageRepository = null;
 
     /**
      * @var resource
@@ -219,7 +227,11 @@ trait ImageConfigurationTrait {
      * @return self
      */
     public function setCategory($category) {
-        $this->category = $category;
+        if (in_array($category, $this->imageRepository->getCategories())) {
+            $this->category = $category;
+        } else {
+            $this->setText('! Category not found !');
+        }
         return $this;
     }
 
