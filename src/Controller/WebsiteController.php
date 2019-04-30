@@ -75,6 +75,16 @@ class WebsiteController extends AbstractController {
     }
 
     /**
+     * @Route("/similar-sites/", name="similar-sites_slash")
+     * @Route("/similar-sites", name="similar-sites")
+     */
+    public function similarSites() {
+        // @todo Add update url for images, generate them and store it
+        return $this->render('website/similar-sites.html.twig', [
+        ]);
+    }
+
+    /**
      * @Route("/contact/{id}", name="contact_id")
      * @Route("/contact/", name="contact_slash")
      * @Route("/contact", name="contact")

@@ -4,6 +4,9 @@
 <li class="nav-item{% if app.request.get('_route') == 'documentation' %} active{% endif %}">
     <a class="nav-link" href="{{ path('documentation') }}">Documentation</a>
 </li>
+<li class="nav-item{% if app.request.get('_route') == 'similar-sites' %} active{% endif %}">
+    <a class="nav-link" href="{{ path('similar-sites') }}">Similar sites</a>
+</li>
 <li class="nav-item{% if app.request.get('_route') == 'contact' %} active{% endif %}">
     <a class="nav-link" href="{{ path('contact') }}">Contact</a>
 </li>
