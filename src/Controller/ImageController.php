@@ -33,6 +33,8 @@ class ImageController extends AbstractController {
             ->setBorder($request->query->getInt('border', 0))
             ->setPosition($request->query->get('position', ''));
 
+        $fontSize = min($generateImageUtility->getWidth() * 0.2, $generateImageUtility->getHeight() * 0.6);
+
         $response = new Response();
         $disposition = $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_INLINE, 'placeholder.svg');
         $response->headers->set('Content-disposition', $disposition);
@@ -49,7 +51,7 @@ class ImageController extends AbstractController {
                 </style>
             </defs>
             <rect x="2" y="2" width="<?php echo ($generateImageUtility->getWidth() - $generateImageUtility->getBorder()); ?>" height="<?php echo ($generateImageUtility->getHeight() - $generateImageUtility->getBorder()); ?>" style="fill:<?php echo $generateImageUtility->getBackgroundColor(); ?>;stroke:<?php echo $generateImageUtility->getForegroundColor(); ?>;stroke-width:<?php echo $generateImageUtility->getBorder(); ?>"/>
-            <text x="50%" y="50%" font-size="2rem" text-anchor="middle" dominant-baseline="middle" font-family="Roboto, monospace, sans-serif" fill="<?php echo $generateImageUtility->getForegroundColor(); ?>">
+            <text x="50%" y="50%" font-size="<?php echo $fontSize; ?>px" text-anchor="middle" dominant-baseline="middle" font-family="Roboto, monospace, sans-serif" fill="<?php echo $generateImageUtility->getForegroundColor(); ?>">
                 <?php echo $generateImageUtility->getWidth(); ?>×<?php echo $generateImageUtility->getHeight(); ?>
             </text>
         </svg>

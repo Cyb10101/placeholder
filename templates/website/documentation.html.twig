@@ -6,102 +6,138 @@
         <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
         <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
     </div>
-	<div class="container section-documentation">
-		<div class="row">
+    <div class="container section-documentation">
+        <div class="row">
 
-			<div class="col-12">
-				<h3>Parameter</h3>
-				<hr>
-				<p>
-					Usage for text:<br />
-					/text/format/forecolor/backcolor/?other=parameter<br />
-				</p>
-				<p>
-					Usage for image:<br />
-					/image/format/category/forecolor/?other=parameter<br />
-				</p>
-				<p>
-					See examples at the end of page!
-				</p>
+            <div class="col-12">
+                <h3>Parameter</h3>
+                <hr>
+                <p>
+                    Usage for text:<br />
+                    /text/format/forecolor/backcolor/?other=parameter<br />
+                </p>
+                <p>
+                    Usage for image:<br />
+                    /image/format/category/forecolor/?other=parameter<br />
+                </p>
+                <p>
+                    See examples at the end of page!
+                </p>
 
-				{% if parameter|length > 0 %}
-					<table class="table table-striped text-left">
-						<thead>
-						<tr>
-							<th>Parameter</th>
-							<th>Description</th>
-						</tr>
-						</thead>
-						<tbody>
-							{% for key, value in parameter %}
-								<tr>
-									<td>{{ key }}</td>
-									<td>{{ value|raw }}</td>
-								</tr>
-							{% endfor %}
-							</div>
-						</tbody>
-					</table>
-				{% endif %}
-			</div>
+                {% if parameter|length > 0 %}
+                    <table class="table table-striped text-left">
+                        <thead>
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Description</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            {% for key, value in parameter %}
+                                <tr>
+                                    <td>{{ key }}</td>
+                                    <td>{{ value|raw }}</td>
+                                </tr>
+                            {% endfor %}
+                            </div>
+                        </tbody>
+                    </table>
+                {% endif %}
+            </div>
 
-			<div class="col-12">
-				<h3>Format table</h3>
-				<hr>
-				<p>These format can be used for the format parameter</p>
+            <div class="col-12">
+                <h3>Format table</h3>
+                <hr>
+                <p>These format can be used for the format parameter</p>
 
-				{% if formats|length > 0 %}
-					<table class="table table-striped text-left">
-						<thead>
-						<tr>
-							<th>Format</th>
-							<th>Size</th>
-						</tr>
-						</thead>
-						<tbody>
-						{% for format in formats %}
-							<tr>
-								<td>{{ format.key }}</td>
-								<td>{{ format.width }}x{{ format.height }}</td>
-							</tr>
-						{% endfor %}
-						</tbody>
-					</table>
-				{% endif %}
-			</div>
+                {% if formats|length > 0 %}
+                    <table class="table table-striped text-left">
+                        <thead>
+                        <tr>
+                            <th>Format</th>
+                            <th>Size</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for format in formats %}
+                            <tr>
+                                <td>{{ format.key }}</td>
+                                <td>{{ format.width }}x{{ format.height }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+            </div>
 
-			<div class="col-12">
-				<h3>Examples for text</h3>
-				<hr>
-				<p>Click to image to get the url</p>
+            <div class="col-12">
+                <h3>Examples for text</h3>
+                <hr>
+                <p>Click to image to get the url</p>
 
-				{% if examplesText|length > 0 %}
-					<div class="row">
-						{% for url, title in examplesText %}
-							<div class="col-md-4">
-								<a href="{{ url }}" target="_blank"><img class="img-responsive" src="{{ url }}" alt="" /></a>
-								<p>{{ title }}</p>
-							</div>
-						{% endfor %}
-					</div>
-				{% endif %}
+                {% if examplesTexts|length > 0 %}
+                    <div class="row">
+                        {% for item in examplesTexts %}
+                            <div class="col-lg-3 col-md-4 col-sm-6 mb-3">
+                                <a href="{{ item.url }}" target="_blank">
+                                    <div class="card">
+                                        <img class="card-img-top" src="{{ item.url }}" alt="{{ item.title }}">
+                                        <div class="card-body">
+                                            <h5 class="card-title">{{ item.title }}</h5>
+                                            <p class="card-text">{{ item.title }}</p>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
 
-				<h3>Examples for image</h3>
-				<hr>
-				<p>Click to image to get the url</p>
+                <h3>Examples for svg</h3>
+                <hr>
+                <p>Click to image to get the url</p>
 
-				{% if examplesImage|length > 0 %}
-					<div class="row">
-						{% for url, title in examplesImage %}
-							<div class="col-md-4">
-								<a href="{{ url }}" target="_blank"><img class="img-responsive" src="{{ url }}" alt="" /></a>
-								<p>{{ title }}</p>
-							</div>
-						{% endfor %}
-					</div>
-				{% endif %}
-			</div>
+                {% if examplesSvgs|length > 0 %}
+                    <div class="row">
+                        {% for item in examplesSvgs %}
+                            <div class="col-lg-3 col-md-4 col-sm-6 mb-3">
+                                <a href="{{ item.url }}" target="_blank">
+                                    <div class="card">
+                                        <img class="card-img-top" src="{{ item.url }}" alt="{{ item.title }}">
+                                        <div class="card-body">
+                                            <h5 class="card-title">{{ item.title }}</h5>
+                                            <p class="card-text">{{ item.title }}</p>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
 
-		</div>
-	</div>
+                <h3>Examples for image</h3>
+                <hr>
+                <p>Click to image to get the url</p>
+
+                {% if examplesImages|length > 0 %}
+                    <div class="row">
+                        {% for item in examplesImages %}
+                            <div class="col-lg-3 col-md-4 col-sm-6 mb-3">
+                                <a href="{{ item.url }}" target="_blank">
+                                    <div class="card">
+                                        <img class="card-img-top" src="{{ item.url }}" alt="{{ item.title }}">
+                                        <div class="card-body">
+                                            <h5 class="card-title">{{ item.title }}</h5>
+                                            <p class="card-text">{{ item.title }}</p>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
 {% endblock %}
