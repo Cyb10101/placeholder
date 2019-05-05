@@ -7,10 +7,13 @@ use App\Entity\Image;
 use App\Repository\FontRepository;
 use App\Repository\FormatRepository;
 use App\Repository\ImageRepository;
+use App\Traits\ControllerTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 
 class WebsiteController extends AbstractController {
+    use ControllerTrait;
+
     /**
      * @Route("/documentation/", name="documentation_slash")
      * @Route("/documentation", name="documentation")

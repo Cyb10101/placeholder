@@ -1,5 +1,5 @@
 <?php
-namespace App\Traits;
+namespace App\Utility\Generator;
 
 use App\Entity\Font;
 use App\Entity\Format;
@@ -8,13 +8,20 @@ use App\Repository\FontRepository;
 use App\Repository\FormatRepository;
 use App\Repository\ImageRepository;
 use App\Utility\FileUtility;
-use App\Utility\GeneralUtility;
 use App\Utility\RequestUtility;
+use App\Utility\Singleton;
+use Doctrine\Bundle\DoctrineBundle\Registry;
 
 /**
- * Trait ImageConfigurationTrait
+ * Trait ImageConfiguration
+ * @package App\Utility\Generator
  */
-trait ImageConfigurationTrait {
+class ImageConfiguration extends Singleton {
+    /**
+     * @var Registry
+     */
+    protected $doctrine = null;
+
     /**
      * @var FontRepository
      */
@@ -26,14 +33,9 @@ trait ImageConfigurationTrait {
     protected $formatRepository = null;
 
     /**
-     * @var resource
+     * @var ImageRepository
      */
-    protected $image = null;
-
-    /**
-     * @var string
-     */
-    protected $mimeType = 'image/jpeg';
+    protected $imageRepository = null;
 
     /**
      * @var string
@@ -91,37 +93,36 @@ trait ImageConfigurationTrait {
     protected $positionChanged = false;
 
     /**
+     * @var string
+     */
+    protected $mimeType = 'image/jpeg';
+
+    /**
      * @var Font
      */
     protected $font = null;
 
     /**
-     * @return string
+     * @var Image
      */
-    public function getMimeType(): string {
-        return $this->mimeType;
+    protected $image = null;
+
+    /**
+     * @return ImageConfiguration
+     */
+    public static function getInstance(): ImageConfiguration {
+        return parent::getInstance();
     }
 
     /**
-     * @param string $mimeType
+     * @param Registry $doctrine
      * @return self
      */
-    public function setMimeType($mimeType) {
-        $this->mimeType = $mimeType;
-        return $this;
-    }
-
-    /**
-     * @param string $extension
-     * @return self
-     */
-    public function setMimeTypeByExtension(string $extension) {
-        if (!empty($extension)) {
-            $fileType = FileUtility::getMimeTypeByFileExtension('file.' . $extension);
-            if (in_array($fileType, ['image/jpeg', 'image/png', 'image/gif'])) {
-                $this->mimeType = $fileType;
-            }
-        }
+    public function initialize(Registry $doctrine): ImageConfiguration {
+        $this->doctrine = $doctrine;
+        $this->fontRepository = $this->doctrine->getRepository(Font::class);
+        $this->formatRepository = $this->doctrine->getRepository(Format::class);
+        $this->imageRepository = $this->doctrine->getRepository(Image::class);
         return $this;
     }
 
@@ -339,12 +340,39 @@ trait ImageConfigurationTrait {
     }
 
     /**
+     * @return string
+     */
+    public function getMimeType(): string {
+        return $this->mimeType;
+    }
+
+    /**
+     * @param string $mimeType
+     * @return self
+     */
+    public function setMimeType($mimeType) {
+        $this->mimeType = $mimeType;
+        return $this;
+    }
+
+    /**
+     * @param string $extension
+     * @return self
+     */
+    public function setMimeTypeByImageExtension(string $extension) {
+        if (!empty($extension)) {
+            $fileType = FileUtility::getMimeTypeByFileExtension('file.' . $extension);
+            if (in_array($fileType, ['image/jpeg', 'image/png', 'image/gif'])) {
+                $this->mimeType = $fileType;
+            }
+        }
+        return $this;
+    }
+
+    /**
      * @return Font
      */
     public function getFont(): Font {
-        if (empty($this->font)) {
-            $this->font = $this->fontRepository->findOneRandom();
-        }
         return $this->font;
     }
 
@@ -365,5 +393,97 @@ trait ImageConfigurationTrait {
             $this->font = $font;
         }
         return $this;
+    }
+
+    /**
+     * @return Image
+     */
+    public function getImage(): Image {
+        return $this->image;
+    }
+
+    /**
+     * @param Image $image
+     * @return self
+     */
+    public function setImage($image) {
+        if (!$image instanceof Image) {
+            $image = $this->imageRepository->findOneRandom($this->getCategory());
+        }
+        $this->image = $image;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getImageRelativePath(): string {
+        if (!$this->image instanceof Image) {
+            return '';
+        }
+        return $this->image->getCategory() . '/' . $this->image->getFile();
+    }
+
+    /**
+     * @return array
+     */
+    public function toArray() {
+        $parameter = [
+            'type' => $this->type,
+            'mimeType' => $this->mimeType,
+            'width' => $this->width,
+            'height' => $this->height,
+            'text' => $this->text,
+            'category' => $this->category,
+            'backgroundColor' => $this->backgroundColor,
+            'foregroundColor' => $this->foregroundColor,
+            'foregroundColorChanged' => $this->foregroundColorChanged,
+            'border' => $this->border,
+            'position' => $this->position,
+            'positionChanged' => $this->positionChanged,
+            'image' => '',
+            'font' => '',
+        ];
+        if ($this->image instanceof Image) {
+            $parameter['image'] = $this->image->getId();
+        }
+        if ($this->font instanceof Font) {
+            $parameter['font'] = $this->font->getId();
+        }
+        return $parameter;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCacheFilename(): string {
+        $hash = hash('sha256', serialize($this->toArray()));
+        $extension = FileUtility::getFileExtensionByMimeType($this->mimeType);
+        return $this->type . '_' . $hash . '.' . $extension;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTitleFilename(): string {
+        $extension = FileUtility::getFileExtensionByMimeType($this->mimeType);
+        return $this->type . '_' . $this->width . 'x' . $this->height. '.' . $extension;
+    }
+
+    /**
+     * @return void
+     */
+    public function completion() {
+        // Set text
+        if (empty($this->getText())) {
+            if ($this->isForegroundColorChanged() || $this->getType() !== 'image' || $this->isPositionChanged()) {
+                $this->setText($this->getWidth() . 'x' . $this->getHeight());
+            }
+        }
+
+        // Set image
+        if ($this->getType() === 'image') {
+            $this->setImage(''); // Just initialize it
+        }
     }
 }
