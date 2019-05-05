@@ -1,14 +1,18 @@
 <?php
 namespace App\Controller;
 
+use App\Traits\ControllerTrait;
+use App\Utility\GenerateImageUtility;
+use App\Utility\Generator\ImageConfiguration;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Annotation\Route;
 
 class ImageController extends AbstractController {
+    use ControllerTrait;
+
     /**
      * @Route("/svg/{format}/{forecolor}/{backcolor}.{extension}", name="svg_format_forecolor_backcolor_extension")
      * @Route("/svg/{format}/{forecolor}/{backcolor}/", name="svg_format_forecolor_backcolor_slash")
@@ -21,38 +25,41 @@ class ImageController extends AbstractController {
      * @Route("/svg/{format}", name="svg_format")
      */
     public function svg(Request $request, string $format, string $forecolor = '', string $backcolor = '', string $extension = '') {
-        $generateImageUtility = new \App\Utility\GenerateImageUtility($this->getDoctrine(), $this->getProjectDirectory());
-        $generateImageUtility
+        $imageConfiguration = ImageConfiguration::getInstance();
+        $imageConfiguration
+            ->initialize($this->getDoctrine())
             ->setType('text')
             ->setFormat($format)
             ->setForegroundColor($forecolor)
             ->setBackgroundColor($backcolor)
-            ->setMimeTypeByExtension($extension)
+            ->setMimeType('image/svg+xml')
             ->setText($request->query->get('text', ''))
             ->setFont($request->query->get('font', ''))
             ->setBorder($request->query->getInt('border', 0))
-            ->setPosition($request->query->get('position', ''));
+            ->setPosition($request->query->get('position', ''))
+            ->completion()
+        ;
 
-        $fontSize = min($generateImageUtility->getWidth() * 0.2, $generateImageUtility->getHeight() * 0.6);
+        $fontSize = min($imageConfiguration->getWidth() * 0.2, $imageConfiguration->getHeight() * 0.6);
 
         $response = new Response();
-        $disposition = $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_INLINE, 'placeholder.svg');
+        $disposition = $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_INLINE, $imageConfiguration->getTitleFilename());
         $response->headers->set('Content-disposition', $disposition);
-        $response->headers->set('Content-type', 'image/svg+xml');
+        $response->headers->set('Content-type', $imageConfiguration->getMimeType());
         ob_start();
         ?>
-        <svg width="<?php echo $generateImageUtility->getWidth(); ?>"
-             height="<?php echo $generateImageUtility->getHeight(); ?>"
-             viewBox="0 0 <?php echo $generateImageUtility->getWidth(); ?> <?php echo $generateImageUtility->getHeight(); ?>"
+        <svg width="<?php echo $imageConfiguration->getWidth(); ?>"
+             height="<?php echo $imageConfiguration->getHeight(); ?>"
+             viewBox="0 0 <?php echo $imageConfiguration->getWidth(); ?> <?php echo $imageConfiguration->getHeight(); ?>"
              xmlns="http://www.w3.org/2000/svg">
             <defs>
                 <style type="text/css">
                     @import url('https://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic');
                 </style>
             </defs>
-            <rect x="0" y="0" width="<?php echo $generateImageUtility->getWidth(); ?>" height="<?php echo $generateImageUtility->getHeight(); ?>" style="fill:<?php echo $generateImageUtility->getBackgroundColor(); ?>;stroke:<?php echo $generateImageUtility->getForegroundColor(); ?>;stroke-width:<?php echo ($generateImageUtility->getBorder() * 2); ?>"/>
-            <text x="50%" y="50%" font-size="<?php echo $fontSize; ?>px" text-anchor="middle" dominant-baseline="middle" font-family="Roboto, monospace, sans-serif" fill="<?php echo $generateImageUtility->getForegroundColor(); ?>">
-                <?php echo $generateImageUtility->getWidth(); ?>×<?php echo $generateImageUtility->getHeight(); ?>
+            <rect x="0" y="0" width="<?php echo $imageConfiguration->getWidth(); ?>" height="<?php echo $imageConfiguration->getHeight(); ?>" style="fill:<?php echo $imageConfiguration->getBackgroundColor(); ?>;stroke:<?php echo $imageConfiguration->getForegroundColor(); ?>;stroke-width:<?php echo ($imageConfiguration->getBorder() * 2); ?>"/>
+            <text x="50%" y="50%" font-size="<?php echo $fontSize; ?>px" text-anchor="middle" dominant-baseline="middle" font-family="Roboto, monospace, sans-serif" fill="<?php echo $imageConfiguration->getForegroundColor(); ?>">
+                <?php echo $imageConfiguration->getWidth(); ?>×<?php echo $imageConfiguration->getHeight(); ?>
             </text>
         </svg>
         <?php
@@ -73,25 +80,31 @@ class ImageController extends AbstractController {
      * @Route("/text/{format}", name="text_format")
      */
     public function text(Request $request, string $format, string $forecolor = '', string $backcolor = '', string $extension = '') {
-        $generateImageUtility = new \App\Utility\GenerateImageUtility($this->getDoctrine(), $this->getProjectDirectory());
-        $generateImageUtility
+        $imageConfiguration = ImageConfiguration::getInstance();
+        $imageConfiguration
+            ->initialize($this->getDoctrine())
             ->setType('text')
             ->setFormat($format)
             ->setForegroundColor($forecolor)
             ->setBackgroundColor($backcolor)
-            ->setMimeTypeByExtension($extension)
+            ->setMimeTypeByImageExtension($extension)
             ->setText($request->query->get('text', ''))
             ->setFont($request->query->get('font', ''))
             ->setBorder($request->query->getInt('border', 0))
             ->setPosition($request->query->get('position', ''))
-            ->createText()
-            ->generateImage()
+            ->completion()
         ;
 
-        $filename = $generateImageUtility->getTextFilename();
-        $fileGenerated = $generateImageUtility->saveImage($this->getCachePath());
+        $generateImageUtility = new GenerateImageUtility($imageConfiguration, $this->getProjectDirectory());
 
-        return $this->file($fileGenerated, $filename, ResponseHeaderBag::DISPOSITION_INLINE);
+        $filename = $imageConfiguration->getCacheFilename();
+        $fileGenerated = $this->getCachePath() . '/' . $filename;
+        if (!is_readable($fileGenerated)) {
+            $generateImageUtility->createText()->generateImage();
+            $generateImageUtility->saveImage($this->getCachePath());
+        }
+
+        return $this->file($fileGenerated, $imageConfiguration->getTitleFilename(), ResponseHeaderBag::DISPOSITION_INLINE);
     }
 
     /**
@@ -106,36 +119,30 @@ class ImageController extends AbstractController {
      * @Route("/image/{format}", name="image_format")
      */
     public function image(Request $request, string $format, string $category = '', string $forecolor = '', string $extension = '') {
-        $generateImageUtility = new \App\Utility\GenerateImageUtility($this->getDoctrine(), $this->getProjectDirectory());
-        $generateImageUtility
+        $imageConfiguration = ImageConfiguration::getInstance();
+        $imageConfiguration
+            ->initialize($this->getDoctrine())
             ->setType('image')
             ->setFormat($format)
-            ->setForegroundColor($forecolor)
             ->setCategory($category)
-            ->setMimeTypeByExtension($extension)
+            ->setForegroundColor($forecolor)
+            ->setMimeTypeByImageExtension($extension)
             ->setText($request->query->get('text', ''))
             ->setFont($request->query->get('font', ''))
             ->setBorder($request->query->getInt('border', 0))
             ->setPosition($request->query->get('position', ''))
-            ->createImage()
-            ->generateImage()
+            ->completion()
         ;
 
-        $filename = $generateImageUtility->getImageFilename();
-        $fileGenerated = $generateImageUtility->saveImage($this->getCachePath());
+        $generateImageUtility = new GenerateImageUtility($imageConfiguration, $this->getProjectDirectory());
 
-        return $this->file($fileGenerated, $filename, ResponseHeaderBag::DISPOSITION_INLINE);
-    }
+        $filename = $imageConfiguration->getCacheFilename();
+        $fileGenerated = $this->getCachePath() . '/' . $filename;
+        if (!is_readable($fileGenerated)) {
+            $generateImageUtility->createImage()->generateImage();
+            $generateImageUtility->saveImage($this->getCachePath());
+        }
 
-    protected function getProjectDirectory(): string {
-        return $this->getParameter('kernel.project_dir');
-    }
-
-    protected function getCachePath(): string {
-        $projectDirectory = $this->getParameter('kernel.cache_dir');
-        $path = $projectDirectory . '/images';
-        $filesystem = new Filesystem();
-        $filesystem->mkdir($path);
-        return $path;
+        return $this->file($fileGenerated, $imageConfiguration->getTitleFilename(), ResponseHeaderBag::DISPOSITION_INLINE);
     }
 }

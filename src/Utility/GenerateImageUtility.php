@@ -1,27 +1,16 @@
 <?php
 namespace App\Utility;
 
-use App\Entity\Font;
-use App\Entity\Format;
-use App\Entity\Image;
-use App\Repository\ImageRepository;
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use App\Utility\Generator\ImageConfiguration;
 
 /**
  * Class GenerateImageUtility
  */
 class GenerateImageUtility {
-    use \App\Traits\ImageConfigurationTrait;
-
     /**
-     * @var Registry
+     * @var ImageConfiguration
      */
-    protected $doctrine = null;
-
-    /**
-     * @var ImageRepository
-     */
-    protected $imageRepository = null;
+    protected $imageConfiguration = null;
 
     /**
      * @var string
@@ -38,13 +27,14 @@ class GenerateImageUtility {
      */
     protected $pathImages = 'public/images/categories';
 
-    public function __construct(Registry $doctrine, string $projectDirectory) {
-        $this->doctrine = $doctrine;
-        $this->projectDirectory = $projectDirectory;
+    /**
+     * @var resource
+     */
+    protected $imageTarget = null;
 
-        $this->fontRepository = $this->doctrine->getRepository(Font::class);
-        $this->formatRepository = $this->doctrine->getRepository(Format::class);
-        $this->imageRepository = $this->doctrine->getRepository(Image::class);
+    public function __construct(ImageConfiguration &$imageConfiguration, string $projectDirectory) {
+        $this->imageConfiguration = &$imageConfiguration;
+        $this->projectDirectory = $projectDirectory;
     }
 
     /**
@@ -54,14 +44,14 @@ class GenerateImageUtility {
         if (!function_exists('imagecreate')) {
             throw new \Exception('Can\'t create new GD-Image-Stream!');
         }
-        $this->image = @imagecreate($this->getWidth(), $this->getHeight());
+        $this->imageTarget = @imagecreate($this->imageConfiguration->getWidth(), $this->imageConfiguration->getHeight());
 
         // Background
-        $backgroundColor = ConvertUtility::colorHexToRgb($this->getBackgroundColor());
+        $backgroundColor = ConvertUtility::colorHexToRgb($this->imageConfiguration->getBackgroundColor());
         if (!GeneralUtility::isColorRGB($backgroundColor)) {
             $backgroundColor = [200, 200, 200];
         }
-        imagecolorallocate($this->image, $backgroundColor[0], $backgroundColor[1], $backgroundColor[2]);
+        imagecolorallocate($this->imageTarget, $backgroundColor[0], $backgroundColor[1], $backgroundColor[2]);
 
         return $this;
     }
@@ -70,14 +60,11 @@ class GenerateImageUtility {
      * @return self
      */
     public function createImage() {
-        $imageFile = null;
-        /** @var \App\Entity\Image $image */
-        $image = $this->imageRepository->findOneRandom($this->getCategory());
-        $imageFile = $this->projectDirectory . '/' . $this->pathImages . '/' . $image->getCategory() . '/' . $image->getFile();
+        $imageFile = $this->projectDirectory . '/' . $this->pathImages . '/' . $this->imageConfiguration->getImage()->getCategory() . '/' . $this->imageConfiguration->getImage()->getFile();
 
         if ($imageFile !== null) {
             $this->createImageFromFile($imageFile);
-            $this->shrinkAndCut($this->getWidth(), $this->getHeight());
+            $this->shrinkAndCut($this->imageConfiguration->getWidth(), $this->imageConfiguration->getHeight());
         }
         return $this;
     }
@@ -87,13 +74,13 @@ class GenerateImageUtility {
      * @return void
      */
     public function createImageFromFile($file) {
-        $this->setMimeType(FileUtility::getMimeTypeByFileExtension($file));
+        $this->imageConfiguration->setMimeType(FileUtility::getMimeTypeByFileExtension($file));
 
         $fileType = FileUtility::getMimeTypeByFilename($file);
         switch($fileType) {
-            case 'image/jpeg': $this->image = imagecreatefromjpeg($file); break;
-            case 'image/png': $this->image = imagecreatefrompng($file); break;
-            case 'image/gif': $this->image = imagecreatefromgif($file); break;
+            case 'image/jpeg': $this->imageTarget = imagecreatefromjpeg($file); break;
+            case 'image/png': $this->imageTarget = imagecreatefrompng($file); break;
+            case 'image/gif': $this->imageTarget = imagecreatefromgif($file); break;
             default:
                 throw new \Exception('Create image from file failed!');
         }
@@ -105,24 +92,24 @@ class GenerateImageUtility {
      * @return void
      */
     public function shrinkAndCut($width = 400, $height = 400) {
-        $sourceWidth = imagesx($this->image);
-        $sourceHeight = imagesy($this->image);
+        $sourceWidth = imagesx($this->imageTarget);
+        $sourceHeight = imagesy($this->imageTarget);
 
         $resize = CalculationUtility::calcShrinkBoxCover($sourceWidth, $sourceHeight, $width, $height);
 
         $shrinkImage = imagecreatetruecolor($resize->width, $resize->height);
         if ($shrinkImage !== false) {
-            $this->setImageTransparent($shrinkImage, $this->getMimeType());
-            imagecopyresampled($shrinkImage, $this->image, 0, 0, 0, 0, $resize->width, $resize->height, $sourceWidth, $sourceHeight);
+            $this->setImageTransparent($shrinkImage, $this->imageConfiguration->getMimeType());
+            imagecopyresampled($shrinkImage, $this->imageTarget, 0, 0, 0, 0, $resize->width, $resize->height, $sourceWidth, $sourceHeight);
 
             $cutImage = imagecreatetruecolor($width, $height);
             if ($shrinkImage !== false) {
                 $gap = CalculationUtility::calcGap($resize->width, $resize->height, $width, $height);
-                $this->setImageTransparent($cutImage, $this->getMimeType());
+                $this->setImageTransparent($cutImage, $this->imageConfiguration->getMimeType());
                 imagecopyresampled($cutImage, $shrinkImage, 0, 0, $gap->width, $gap->height, $width, $height, $width, $height);
 
-                imagedestroy($this->image);
-                $this->image = $cutImage;
+                imagedestroy($this->imageTarget);
+                $this->imageTarget = $cutImage;
             }
             imagedestroy($shrinkImage);
         }
@@ -147,29 +134,22 @@ class GenerateImageUtility {
      * @return self
      */
     public function generateImage() {
-        // Set text
-        if (empty($this->getText())) {
-            if ($this->isForegroundColorChanged() || $this->getType() !== 'image' || $this->isPositionChanged()) {
-                $this->setText($this->getWidth() . 'x' . $this->getHeight());
-            }
-        }
-
         // Draw text
-        if (!empty($this->getText())) {
-            $fontFile = $this->projectDirectory . '/' . $this->pathFonts . '/' . $this->getFont()->getFile();
-            $textColor = ConvertUtility::colorHexToRgb($this->getForegroundColor());
-            $shadowColor = ConvertUtility::colorHexToRgb(ConvertUtility::colorHexAdjustBrightness($this->getForegroundColor(), -50));
+        if (!empty($this->imageConfiguration->getText())) {
+            $fontFile = $this->projectDirectory . '/' . $this->pathFonts . '/' . $this->imageConfiguration->getFont()->getFile();
+            $textColor = ConvertUtility::colorHexToRgb($this->imageConfiguration->getForegroundColor());
+            $shadowColor = ConvertUtility::colorHexToRgb(ConvertUtility::colorHexAdjustBrightness($this->imageConfiguration->getForegroundColor(), -50));
 
-            if ($this->getPosition() === 'vertical-left') {
-                $this->textBottomLeft($this->getText(), $fontFile, 100, $textColor, $shadowColor);
+            if ($this->imageConfiguration->getPosition() === 'vertical-left') {
+                $this->textBottomLeft($this->imageConfiguration->getText(), $fontFile, 100, $textColor, $shadowColor);
             } else {
-                $this->textCenter($this->getText(), $fontFile, 100, $textColor, $shadowColor);
+                $this->textCenter($this->imageConfiguration->getText(), $fontFile, 100, $textColor, $shadowColor);
             }
         }
 
         // Draw border
-        if ($this->getBorder() > 0) {
-            $this->drawBorder($this->getBorder(), ConvertUtility::colorHexToRgb($this->getForegroundColor()));
+        if ($this->imageConfiguration->getBorder() > 0) {
+            $this->drawBorder($this->imageConfiguration->getBorder(), ConvertUtility::colorHexToRgb($this->imageConfiguration->getForegroundColor()));
         }
 
         return $this;
@@ -177,36 +157,20 @@ class GenerateImageUtility {
 
     /**
      * @param string $path
-     * @return string
+     * @return bool
      * @throws \Exception
      */
-    public function saveImage(string $path): string {
-        if ($this->getType() === 'image') {
-            $file = $this->getTextFilename($this->mimeType);
-        } else {
-            $file = $this->getTextFilename($this->mimeType);
-        }
+    public function saveImage(string $path): bool {
+        $filename = $path . '/' . $this->imageConfiguration->getCacheFilename();
 
-        switch($this->mimeType) {
-            case 'image/jpeg': imagejpeg($this->image, $path . '/' . $file, 100); break;
-            case 'image/png': imagepng($this->image, $path . '/' . $file); break;
-            case 'image/gif': imagegif($this->image, $path . '/' . $file); break;
+        switch($this->imageConfiguration->getMimeType()) {
+            case 'image/jpeg': imagejpeg($this->imageTarget, $filename, 100); break;
+            case 'image/png': imagepng($this->imageTarget, $filename); break;
+            case 'image/gif': imagegif($this->imageTarget, $filename); break;
             default:
                 throw new \Exception('Save image failed!');
         }
-        return $path . '/' . $file;
-    }
-
-    // @todo Cache id for filenames
-    public function getTextFilename(string $mimeType = 'image/jpeg'): string {
-        $extension = FileUtility::getFileExtensionByMimeType($mimeType);
-        return $this->type . '_' . $this->getWidth() . 'x' . $this->getHeight() . '_' . rand(1, 1000000) . '.' . $extension;
-    }
-
-    // @todo Cache id for filenames
-    public function getImageFilename(string $mimeType = 'image/jpeg'): string {
-        $extension = FileUtility::getFileExtensionByMimeType($mimeType);
-        return $this->type . '_' . $this->getWidth() . 'x' . $this->getHeight() . '_' . rand(1, 1000000) . '.' . $extension;
+        return true;
     }
 
     /**
@@ -222,8 +186,8 @@ class GenerateImageUtility {
             return;
         }
 
-        $sourceWidth = imagesx($this->image);
-        $sourceHeight = imagesy($this->image);
+        $sourceWidth = imagesx($this->imageTarget);
+        $sourceHeight = imagesy($this->imageTarget);
 
         $testSize = true;
         do {
@@ -252,12 +216,12 @@ class GenerateImageUtility {
         $y = (($sourceHeight / 2) - ($height / 2)) + $heightAscent;
 
         // Shaddow
-        $color = imagecolorallocate($this->image, $shadowColor[0], $shadowColor[1], $shadowColor[2]);
-        imagettftext($this->image, $fontSize, 0, ($x + 1), ($y + 1), $color, $font, $text);
+        $color = imagecolorallocate($this->imageTarget, $shadowColor[0], $shadowColor[1], $shadowColor[2]);
+        imagettftext($this->imageTarget, $fontSize, 0, ($x + 1), ($y + 1), $color, $font, $text);
 
         // Text
-        $color = imagecolorallocate($this->image, $textColor[0], $textColor[1], $textColor[2]);
-        imagettftext($this->image, $fontSize, 0, $x, $y, $color, $font, $text);
+        $color = imagecolorallocate($this->imageTarget, $textColor[0], $textColor[1], $textColor[2]);
+        imagettftext($this->imageTarget, $fontSize, 0, $x, $y, $color, $font, $text);
     }
 
     /**
@@ -273,7 +237,7 @@ class GenerateImageUtility {
             return;
         }
 
-        $sourceHeight = imagesy($this->image);
+        $sourceHeight = imagesy($this->imageTarget);
 
         $testSize = true;
         do {
@@ -293,12 +257,12 @@ class GenerateImageUtility {
         $x = ($fontBox[4] * -1);
 
         // Shaddow
-        $color = imagecolorallocate($this->image, $shadowColor[0], $shadowColor[1], $shadowColor[2]);
-        imagettftext($this->image, $fontSize, 90, ($x + 11), ($sourceHeight - 11), $color, $font, $text);
+        $color = imagecolorallocate($this->imageTarget, $shadowColor[0], $shadowColor[1], $shadowColor[2]);
+        imagettftext($this->imageTarget, $fontSize, 90, ($x + 11), ($sourceHeight - 11), $color, $font, $text);
 
         // Text
-        $color = imagecolorallocate($this->image, $textColor[0], $textColor[1], $textColor[2]);
-        imagettftext($this->image, $fontSize, 90, ($x + 10), ($sourceHeight - 10), $color, $font, $text);
+        $color = imagecolorallocate($this->imageTarget, $textColor[0], $textColor[1], $textColor[2]);
+        imagettftext($this->imageTarget, $fontSize, 90, ($x + 10), ($sourceHeight - 10), $color, $font, $text);
     }
 
     /**
@@ -313,12 +277,12 @@ class GenerateImageUtility {
 
         $x1 = 0;
         $y1 = 0;
-        $x2 = imagesx($this->image) - 1;
-        $y2 = imagesy($this->image) - 1;
+        $x2 = imagesx($this->imageTarget) - 1;
+        $y2 = imagesy($this->imageTarget) - 1;
 
-        $color = imagecolorallocate($this->image, $borderColor[0], $borderColor[1], $borderColor[2]);
+        $color = imagecolorallocate($this->imageTarget, $borderColor[0], $borderColor[1], $borderColor[2]);
         for ($i = 0; $i < $thickness; $i++) {
-            imagerectangle($this->image, $x1++, $y1++, $x2--, $y2--, $color);
+            imagerectangle($this->imageTarget, $x1++, $y1++, $x2--, $y2--, $color);
         }
     }
 }
