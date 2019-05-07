@@ -51,22 +51,30 @@
                 <p>These format can be used for the format parameter</p>
 
                 {% if formats|length > 0 %}
-                    <table class="table table-striped text-left">
-                        <thead>
-                        <tr>
-                            <th>Format</th>
-                            <th>Size</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for format in formats %}
-                            <tr>
-                                <td>{{ format.key }}</td>
-                                <td>{{ format.width }}x{{ format.height }}</td>
-                            </tr>
+                    <div class="row">
+
+                        {% for formatsSplit in formats|batch((formats|length / 4)) %}
+                            <div class="col-lg-3 col-md-6 col-12">
+                                <table class="table table-striped text-left">
+                                    <thead>
+                                    <tr>
+                                        <th>Format</th>
+                                        <th>Size</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for format in formatsSplit %}
+                                        <tr>
+                                            <td>{{ format.key }}</td>
+                                            <td>{{ format.width }}x{{ format.height }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
                         {% endfor %}
-                        </tbody>
-                    </table>
+
+                    </div>
                 {% endif %}
             </div>
 
