@@ -58,7 +58,7 @@ abstract class CalculationUtility {
      * @param $height
      * @return \stdClass
      */
-    public function calcGap($originalWidth, $originalHeight, $width, $height) {
+    public static function calcGap($originalWidth, $originalHeight, $width, $height) {
         $gapWidth = 0; $gapHeight = 0;
         if ($originalWidth > $width) {
             $gapWidth = ($originalWidth - $width) / 2;
@@ -71,5 +71,26 @@ abstract class CalculationUtility {
         $return->width = $gapWidth;
         $return->height = $gapHeight;
         return $return;
+    }
+
+    /**
+     * @param string $text
+     * @param int $fontSize
+     * @param string $font
+     * @param int $width
+     * @return int
+     */
+    public static function gdReduceFontSize(string $text, string $font, int $fontSize, int $width): int {
+        $testSize = true;
+        do {
+            $fontBox = \imagettfbbox($fontSize, 0, $font, $text);
+            $padding = 40;
+            if ($fontSize === 1 || ($padding + ($fontBox[4] - $fontBox[0]) < $width)) {
+                $testSize = false;
+            } else {
+                $fontSize--;
+            }
+        } while ($testSize === true);
+        return $fontSize;
     }
 }

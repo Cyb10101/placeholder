@@ -95,13 +95,12 @@ class ImageController extends AbstractController {
             ->completion()
         ;
 
-        $generateImageUtility = new GenerateImageUtility($imageConfiguration, $this->getProjectDirectory());
+        $generateImageUtility = new GenerateImageUtility($imageConfiguration, $this->getProjectDirectory(), $this->getCacheDirectory());
 
         $filename = $imageConfiguration->getCacheFilename();
-        $fileGenerated = $this->getCachePath() . '/' . $filename;
-        if (!is_readable($fileGenerated)) {
-            $generateImageUtility->createText()->generateImage();
-            $generateImageUtility->saveImage($this->getCachePath());
+        $fileGenerated = $this->getCacheDirectory() . '/' . $filename;
+        if ($this->isDevelopment() || !is_readable($fileGenerated)) {
+            $generateImageUtility->createText();
         }
 
         return $this->file($fileGenerated, $imageConfiguration->getTitleFilename(), ResponseHeaderBag::DISPOSITION_INLINE);
@@ -134,13 +133,12 @@ class ImageController extends AbstractController {
             ->completion()
         ;
 
-        $generateImageUtility = new GenerateImageUtility($imageConfiguration, $this->getProjectDirectory());
+        $generateImageUtility = new GenerateImageUtility($imageConfiguration, $this->getProjectDirectory(), $this->getCacheDirectory());
 
         $filename = $imageConfiguration->getCacheFilename();
-        $fileGenerated = $this->getCachePath() . '/' . $filename;
-        if (!is_readable($fileGenerated)) {
-            $generateImageUtility->createImage()->generateImage();
-            $generateImageUtility->saveImage($this->getCachePath());
+        $fileGenerated = $this->getCacheDirectory() . '/' . $filename;
+        if ($this->isDevelopment() || !is_readable($fileGenerated)) {
+            $generateImageUtility->createImage();
         }
 
         return $this->file($fileGenerated, $imageConfiguration->getTitleFilename(), ResponseHeaderBag::DISPOSITION_INLINE);
