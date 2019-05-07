@@ -28,6 +28,11 @@ class MagickUtility extends Singleton {
     protected $existsImageMagick = null;
 
     /**
+     * @var array
+     */
+    protected $stacks = [];
+
+    /**
      * @var string
      */
     protected $lastCommand = '';
@@ -97,6 +102,22 @@ class MagickUtility extends Singleton {
     }
 
     /**
+     * @return self
+     */
+    public function addStacks(array $stack) {
+        $this->stacks[] = $stack;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function clearStacks(): string {
+        $this->stacks = [];
+        return $this;
+    }
+
+    /**
      * @param string $outputFile
      * @param int $width
      * @param int $height
@@ -104,18 +125,37 @@ class MagickUtility extends Singleton {
      * @return bool
      */
     public function createCanvas(string $outputFile, int $width, int $height, string $backgroundColor): bool {
-        $result = $this->executeConvert([
+        $result = $this->addStacks([
             '-size ' . $width . 'x' . $height,
             'xc:' . $backgroundColor . '',
-            $outputFile
+//            $outputFile
         ]);
-        return $result;
+        return true;
     }
-
 
     /**
      * @param string $inputFile
+     * @return MagickUtility
+     */
+    public function addInputFile(string $inputFile): MagickUtility {
+        $this->addStacks([
+            $inputFile
+        ]);
+        return $this;
+    }
+
+    /**
      * @param string $outputFile
+     * @return MagickUtility
+     */
+    public function addOutputFile(string $outputFile): MagickUtility {
+        $this->addStacks([
+            $outputFile
+        ]);
+        return $this;
+    }
+
+    /**
      * @param int $width
      * @param int $height
      * @param string $text
@@ -123,29 +163,23 @@ class MagickUtility extends Singleton {
      * @param int $fontSize
      * @param string $textColor
      * @param string $shadowColor
-     * @return bool
+     * @return MagickUtility
      */
-    public function textCenter(string $inputFile, string $outputFile, int $width, int $height, $text, string $font, int $fontSize = 100, string $textColor = '#ffffff', $shadowColor = '#7f7f7f'): bool {
+    public function textCenter(int $width, int $height, $text, string $font, int $fontSize = 100, string $textColor = '#ffffff', $shadowColor = '#7f7f7f'): MagickUtility {
         $fontSize = CalculationUtility::gdReduceFontSize($text, $font, $fontSize, $width);
-
-        $result = $this->executeConvert([
+        $this->addStacks([
             '-gravity center',
             '-font ' . $font,
             '-pointsize ' . $fontSize,
             '-fill "' . $shadowColor . '"',
             '-draw "text 1,1 \'' . $text . '\'"',
             '-fill "' . $textColor . '"',
-            '-draw "text 0,0 \'' . $text . '\'"',
-            $inputFile,
-            $outputFile
+            '-draw "text 0,0 \'' . $text . '\'"'
         ]);
-
-        return $result;
+        return $this;
     }
 
     /**
-     * @param string $inputFile
-     * @param string $outputFile
      * @param int $width
      * @param int $height
      * @param $text
@@ -153,9 +187,9 @@ class MagickUtility extends Singleton {
      * @param int $fontSize
      * @param string $textColor
      * @param string $shadowColor
-     * @return bool
+     * @return MagickUtility
      */
-    public function textBottomLeft(string $inputFile, string $outputFile, int $width, int $height, $text, string $font, int $fontSize = 100, int $border = 0, string $textColor = '#ffffff', $shadowColor = '#7f7f7f'): bool {
+    public function textBottomLeft(int $width, int $height, $text, string $font, int $fontSize = 100, int $border = 0, string $textColor = '#ffffff', $shadowColor = '#7f7f7f'): MagickUtility {
         $fontSize = CalculationUtility::gdReduceFontSize($text, $font, $fontSize, $height);
         $fontSize += 4;
 
@@ -165,8 +199,7 @@ class MagickUtility extends Singleton {
             $yText = $border;
         }
 
-        $result = $this->executeConvert([
-            $inputFile,
+        $this->addStacks([
             '-pointsize ' . $fontSize,
             '-font ' . $font,
 
@@ -179,66 +212,55 @@ class MagickUtility extends Singleton {
             '-fill "' . $textColor . '"',
             '-draw "text ' . ($border + 4) . ',' . $yText . ' \'' . $text . '\'"',
 
-            '-rotate -90',
-            $outputFile
+            '-rotate -90'
         ]);
-        return $result;
+        return $this;
     }
 
     /**
-     * @param string $inputFile
-     * @param string $outputFile
      * @param int $thickness
      * @param string $borderColor
-     * @return bool
+     * @return MagickUtility
      */
-    public function drawBorder(string $inputFile, string $outputFile, $thickness = 1, $borderColor = '#ffffff'): bool {
-        $result = $this->executeConvert([
-            '-shave ' . $thickness . 'x' . $thickness,
-            '-border ' . $thickness . 'x' . $thickness,
-            '-bordercolor "' . $borderColor . '"',
-            $inputFile,
-            $outputFile
-        ]);
-        return $result;
+    public function drawBorder($thickness = 1, $borderColor = '#ffffff'): MagickUtility {
+        if ($thickness > 0) {
+            $this->addStacks([
+                '-shave ' . $thickness . 'x' . $thickness,
+                '-bordercolor "' . $borderColor . '"',
+                '-border ' . $thickness . 'x' . $thickness
+            ]);
+        }
+        return $this;
     }
 
     /**
-     * @param string $inputFile
-     * @param string $outputFile
      * @param int $width
      * @param int $height Zero to aspect ratio
-     * @return bool
+     * @return MagickUtility
      */
-    public function thumbnailUncut(string $inputFile, string $outputFile, int $width, int $height = 0): bool {
-        $result = $this->executeConvert([
+    public function thumbnailUncut(int $width, int $height = 0): MagickUtility {
+        $this->addStacks([
             '-background transparent',
-            $inputFile,
             '-coalesce',
-            '-thumbnail ' . $width . ($height > 0 ? 'x' . $height : ''),
-            $outputFile
+            '-thumbnail ' . $width . ($height > 0 ? 'x' . $height : '')
         ]);
-        return $result;
+        return $this;
     }
 
     /**
-     * @param string $inputFile
-     * @param string $outputFile
      * @param int $width
      * @param int $height
-     * @return bool
+     * @return MagickUtility
      */
-    public function thumbnailCut(string $inputFile, string $outputFile, int $width, int $height): bool {
-        $result = $this->executeConvert([
+    public function thumbnailCut(int $width, int $height): MagickUtility {
+        $this->addStacks([
             '-background transparent',
-            $inputFile,
             '-coalesce',
             '-thumbnail ' . $width . 'x' . $height . '^',
             '-gravity center',
-            '-extent ' . $width . 'x' . $height,
-            $outputFile
+            '-extent ' . $width . 'x' . $height
         ]);
-        return $result;
+        return $this;
     }
 
     protected function createCommandException() {
@@ -249,16 +271,28 @@ class MagickUtility extends Singleton {
      * @param array $commands
      * @return bool
      */
-    protected function executeConvert(array $commands): bool {
+    public function execute(): bool {
         $output = null;
         $return = null;
+
+        $command = '';
+        if (empty($commands)) {
+            foreach ($this->stacks as $stack) {
+                $command .= ' ' . implode(' ', $stack);
+            }
+            $command = trim($command);
+        }
+
         if ($this->existsGraphicMagick()) {
-            $this->lastCommand = $this->binaryGmagick . ' convert ' . implode(' ', $commands);
-            exec($this->lastCommand, $output, $return);
-            return ($return === 0);
+            $command = $this->binaryGmagick . ' convert ' . $command;
         } else if ($this->existsImageMagick()) {
-            $this->lastCommand = $this->binaryConvertImagick . ' ' . implode(' ', $commands);
-            exec($this->lastCommand, $output, $return);
+            $command = $this->binaryConvertImagick . ' ' . $command;
+        }
+
+        if ($this->isMagick()) {
+            $this->lastCommand = $command;
+            exec($command, $output, $return);
+//            $return === 0 || $this->createCommandException(); // Debug
             return ($return === 0);
         }
         return false;

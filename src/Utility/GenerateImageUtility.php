@@ -64,7 +64,13 @@ class GenerateImageUtility {
             $this->imageConfiguration->getWidth(), $this->imageConfiguration->getHeight(),
             $this->imageConfiguration->getBackgroundColor()
         );
-        $this->drawText()->drawBorder();
+
+        $this->drawText();
+
+        $this->magickUtility
+            ->drawBorder($this->imageConfiguration->getBorder(), $this->imageConfiguration->getForegroundColor())
+            ->addOutputFile($this->getCachedFilename())
+            ->execute();
         return $this;
     }
 
@@ -76,10 +82,16 @@ class GenerateImageUtility {
         $imageFile = $this->projectDirectory . '/' . $this->pathImages . '/' . $image->getCategory() . '/' . $image->getFile();
 
         if ($imageFile !== null) {
-            $this->magickUtility->thumbnailCut($imageFile, $this->getCachedFilename(),
-                $this->imageConfiguration->getWidth(), $this->imageConfiguration->getHeight()
-            );
-            $this->drawText()->drawBorder();
+            $this->magickUtility
+                ->addInputFile($imageFile)
+                ->thumbnailCut($this->imageConfiguration->getWidth(), $this->imageConfiguration->getHeight());
+
+            $this->drawText();
+
+            $this->magickUtility
+                ->drawBorder($this->imageConfiguration->getBorder(), $this->imageConfiguration->getForegroundColor())
+                ->addOutputFile($this->getCachedFilename())
+                ->execute();
         }
         return $this;
     }
@@ -95,14 +107,12 @@ class GenerateImageUtility {
 
             if ($this->imageConfiguration->getPosition() === 'vertical-left') {
                 $this->magickUtility->textBottomLeft(
-                    $this->getCachedFilename(), $this->getCachedFilename(),
                     $this->imageConfiguration->getWidth(), $this->imageConfiguration->getHeight(),
                     $this->imageConfiguration->getText(), $fontFile, 100,
                     $this->imageConfiguration->getBorder(), $textColor, $shadowColor
                 );
             } else {
                   $this->magickUtility->textCenter(
-                    $this->getCachedFilename(), $this->getCachedFilename(),
                     $this->imageConfiguration->getWidth(), $this->imageConfiguration->getHeight(),
                     $this->imageConfiguration->getText(), $fontFile, 100, $textColor, $shadowColor
                 );
@@ -115,12 +125,6 @@ class GenerateImageUtility {
      * @return self
      */
     protected function drawBorder() {
-        if ($this->imageConfiguration->getBorder() > 0) {
-            $this->magickUtility->drawBorder(
-                $this->getCachedFilename(), $this->getCachedFilename(),
-                $this->imageConfiguration->getBorder(), $this->imageConfiguration->getForegroundColor()
-            );
-        }
         return $this;
     }
 }
