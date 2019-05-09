@@ -1,0 +1,15 @@
+{% set icon = {
+    'info': 'info-circle',
+    'success': 'check',
+    'warning': 'bell',
+    'danger': 'exclamation-triangle'
+} %}
+
+{% for label, messages in app.flashes %}
+    {% for message in messages %}
+        <div class="alert alert-{{ label }}">
+            {% if icon[label] is defined %}<span class="fas fa-{{ icon[label] }}"></span>{% endif %}
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endfor %}
