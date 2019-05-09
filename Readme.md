@@ -4,7 +4,7 @@
 
 ```bash
 composer create-project symfony/skeleton .
-composer require annotations doctrine twig twig/extensions
+composer require annotations doctrine mailer twig twig/extensions
 composer require --dev profiler phpsu/phpsu
 ```
 
@@ -19,6 +19,19 @@ composer require --dev profiler phpsu/phpsu
 
 # Update schema, force it
 ./bin/console doctrine:schema:update --force
+```
+
+### .env file
+
+```bash
+# Docker-Global database
+DATABASE_URL=mysql://root:root@global-db/netslum_placeholder
+
+# Docker-Global mail
+MAILER_URL=smtp://global-mail:1025
+
+# Set email for contact
+CONTACT_MAIL=email@example.org
 ```
 
 ## Development

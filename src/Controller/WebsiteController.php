@@ -9,6 +9,7 @@ use App\Repository\FormatRepository;
 use App\Repository\ImageRepository;
 use App\Traits\ControllerTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
 class WebsiteController extends AbstractController {
@@ -103,12 +104,74 @@ class WebsiteController extends AbstractController {
     }
 
     /**
-     * @Route("/contact/{id}", name="contact_id")
+     * @Route("/contact/send", name="contact_send")
+     */
+    public function contactSend(Request $request, \Swift_Mailer $mailer) {
+        $error = false;
+
+        $name = $request->request->get('name', '');
+        $email = $request->request->get('email', '');
+        $subject = 'Request from Placeholder';
+        $message = $request->request->get('message', '');
+
+        if (empty($name)) {
+            $error = true;
+            $this->addFlash('danger', 'Name is required');
+        }
+        if (empty($email)) {
+            $error = true;
+            $this->addFlash('danger', 'E-Mail is required');
+        }
+        if (empty($message)) {
+            $error = true;
+            $this->addFlash('danger', 'Message is required');
+        }
+        if ($error) {
+            return $this->forward(self::class . '::contact');
+        }
+
+        $toMail = getenv('CONTACT_MAIL');
+        if (empty($toMail)) {
+            throw new \Exception('Contact not properly set.');
+        }
+
+        $mailMessage = (new \Swift_Message($subject))
+            ->setFrom($toMail)
+            ->setTo($toMail)
+            ->setReplyTo($email)
+        ;
+
+        $mailMessage->setBody(
+            $this->renderView('website/email/contact.html.twig', [
+                'name' => $name,
+                'email' => $email,
+                'subject' => $subject,
+                'message' => $message,
+            ]), 'text/html'
+        );
+
+        $result = $mailer->send($mailMessage);
+        if ($result) {
+            $this->addFlash('success', 'E-Mail sent');
+        } else {
+            $this->addFlash('danger', 'E-mail not sent');
+        }
+        return $this->redirectToRoute('contact');
+    }
+
+    /**
      * @Route("/contact/", name="contact_slash")
      * @Route("/contact", name="contact")
      */
-    public function contact() {
-        return $this->render('website/root.html.twig', [
+    public function contact(Request $request) {
+        $name = $request->request->get('name', '');
+        $email = $request->request->get('email', '');
+        $message = $request->request->get('message', '');
+
+        return $this->render('website/contact.html.twig', [
+            'name' => $name,
+            'email' => $email,
+            'message' => $message,
         ]);
     }
 
