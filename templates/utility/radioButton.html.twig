@@ -1,0 +1,8 @@
+<div class="radio-toolbar">
+    {% if values|length > 0 %}
+        {% for value,title in values %}
+            <input type="radio" id="{{ key }}-{{ value }}" name="{{ key }}" value="{{ value }}"{% if selected|lower == value|lower %} checked{% endif %}>
+            <label for="{{ key }}-{{ value }}">{{ title }}</label>
+        {% endfor %}
+    {% endif %}
+</div>

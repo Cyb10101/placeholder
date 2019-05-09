@@ -1,1 +1,1 @@
-// require('./1-bottom/javascript.js');
+require('./1-bottom/url-switcher.js');
