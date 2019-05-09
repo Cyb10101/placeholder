@@ -1,29 +1,133 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <div class="box-blue">
-        <h2>Placeholder</h2>
-        <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
-        <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
-    </div>
+    <div class="container section-generate">
+        <div class="row">
+            <div class="col-12">
+                <h3>Generate your Placeholder</h3>
+                <hr>
 
-    <div class="row">
-        <div class="col-6">
-            <h2>Placeholder</h2>
-            <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
-            <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
+            </div>
         </div>
 
-        <div class="col-6">
-            <h2>Placeholder</h2>
-            <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
-            <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
-        </div>
-    </div>
+        <form class="tx-urlswitcher box-blue">
+            <div class="row mb-3">
+                <div class="col-8 offset-2 text-center">
+                    <h4>Type</h4>
+                    {% include 'utility/radioButton.html.twig' with {'key': 'type', 'values': {'text': 'Text', 'svg': 'SVG', 'image': 'Image'}, 'selected': 'text'} %}
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-8 offset-2 text-center">
+                    <h4>Dimension</h4>
 
-    <div class="box-blue">
-        <h2>Placeholder</h2>
-        <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
-        <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
+                    <div class="row">
+                        <div class="col-6 text-center">
+                            <label>Format</label>
+                            <select name="format" id="format" class="form-control">
+                                <option value="width-height" selected>Width & Height</option>
+                                <option value="width-width">Width & Width</option>
+
+                                {% if formats|length > 0 %}
+                                    {% for format in formats %}
+                                        <option value="{{ format.key }}">{{ format.key }}</option>
+                                    {% endfor %}
+                                {% endif %}
+                            </select>
+                        </div>
+                        <div class="col-3 text-center">
+                            <label>Width</label>
+                            <input type="text" name="width" id="width" class="form-control" value="400">
+                        </div>
+                        <div class="col-3 text-center">
+                            <label>Height</label>
+                            <input type="text" name="height" id="height" class="form-control" value="300">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-8 offset-2 text-center select-category">
+                    <h4>Category</h4>
+                    {% include 'utility/radioButton.html.twig' with {'key': 'category', 'values': categories, 'selected': 'none'} %}
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-8 offset-2 text-center">
+                    <h4>Text</h4>
+                    <input type="text" name="text" id="text" class="form-control">
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-8 offset-2 text-center">
+                    <h4>Color</h4>
+
+                    <div class="row">
+                        <div class="col-4 text-center">
+                            <input type="checkbox" name="useForeColor" id="useForeColor"> <label for="useForeColor">Forecolor</label>
+                            <input type="color" name="forecolor" id="forecolor" class="form-control" value="#505050">
+
+                        </div>
+                        <div class="col-4 text-center switch-color">
+                            <button name="switch-color" id="switch-color" class="btn btn-primary btn-sm">&lt;== Switch ==&gt;</button>
+                        </div>
+                        <div class="col-4 text-center backcolor">
+                            <input type="checkbox" name="useBackColor" id="useBackColor"> <label for="useBackColor">Backcolor</label>
+                            <input type="color" name="backcolor" id="backcolor" class="form-control" value="#C8C8C8">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-8 offset-2 text-center">
+                    <div class="row">
+                        <div class="col-4 text-center">
+                            <h4>Text position</h4>
+                            <select name="position" id="position" class="form-control">
+                                <option value="" selected>-- Default: Center --</option>
+                                <option value="vertical-left">Vertical left</option>
+                            </select>
+                        </div>
+                        <div class="col-4 text-center">
+                            <h4>Font</h4>
+                            <select name="font" id="font" class="form-control">
+                                <option value="" selected>Random</option>
+                                {% if fonts|length > 0 %}
+                                    {% for font in fonts %}
+                                        <option value="{{ font.key }}">{{ font.key }}</option>
+                                    {% endfor %}
+                                {% endif %}
+                            </select>
+                        </div>
+                        <div class="col-4 text-center">
+                            <h4>Border</h4>
+                            <select name="border" id="border" class="form-control">
+                                <option value="0" selected>None</option>
+                                {% for i in 1..16 %}
+                                    <option value="{{ i }}">{{ i }}px</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-8 offset-2 text-center">
+                    <h4>Generated url</h4>
+                    <input type="text" name="url" id="url" class="form-control" readonly="">
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-8 offset-2 text-center">
+                    <div class="container-preview-image">
+                        <h4>Generated image</h4>
+                        <a href="#" target="_blank" class="preview-image">
+                            <img class="img-fluid" />
+                        </a>
+                        <a href="#" class="preview-image-refresh pull-left">Refresh</a>
+                    </div>
+                </div>
+            </div>
+        </form>
     </div>
 {% endblock %}

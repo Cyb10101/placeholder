@@ -16,8 +16,8 @@ class WebsiteController extends AbstractController {
     use ControllerTrait;
 
     /**
-     * @Route("/documentation/", name="documentation_slash")
      * @Route("/documentation", name="documentation")
+     * @Route("/documentation/", name="documentation_slash")
      */
     public function documentation() {
         /** @var FontRepository $fontRepository */
@@ -94,8 +94,8 @@ class WebsiteController extends AbstractController {
     }
 
     /**
-     * @Route("/similar-sites/", name="similar-sites_slash")
      * @Route("/similar-sites", name="similar-sites")
+     * @Route("/similar-sites/", name="similar-sites_slash")
      */
     public function similarSites() {
         // @todo Add update url for images, generate them and store it
@@ -160,8 +160,8 @@ class WebsiteController extends AbstractController {
     }
 
     /**
-     * @Route("/contact/", name="contact_slash")
      * @Route("/contact", name="contact")
+     * @Route("/contact/", name="contact_slash")
      */
     public function contact(Request $request) {
         $name = $request->request->get('name', '');
@@ -176,10 +176,34 @@ class WebsiteController extends AbstractController {
     }
 
     /**
+     * @Route("/legal-notice", name="legal-notice")
+     * @Route("/legal-notice/", name="legal-notice_slash")
+     */
+    public function legalNotice() {
+        return $this->render('website/legal-notice.html.twig', [
+        ]);
+    }
+
+    /**
      * @Route("/", name="root")
      */
     public function root() {
+        /** @var FontRepository $fontRepository */
+        $fontRepository = $this->getDoctrine()->getRepository(Font::class);
+        /** @var FormatRepository $formatRepository */
+        $formatRepository = $this->getDoctrine()->getRepository(Format::class);
+        /** @var ImageRepository $imageRepository */
+        $imageRepository = $this->getDoctrine()->getRepository(Image::class);
+
+        $categories = ['none' => 'Random'];
+        foreach ($imageRepository->getCategories() as $category) {
+            $categories[$category] = ucfirst($category);
+        }
+
         return $this->render('website/root.html.twig', [
+            'categories' => $categories,
+            'formats' => $formatRepository->findAll(),
+            'fonts' => $fontRepository->findAll(),
         ]);
     }
 }

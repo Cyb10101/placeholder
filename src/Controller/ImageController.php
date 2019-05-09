@@ -14,15 +14,15 @@ class ImageController extends AbstractController {
     use ControllerTrait;
 
     /**
-     * @Route("/svg/{format}/{forecolor}/{backcolor}.{extension}", name="svg_format_forecolor_backcolor_extension")
-     * @Route("/svg/{format}/{forecolor}/{backcolor}/", name="svg_format_forecolor_backcolor_slash")
-     * @Route("/svg/{format}/{forecolor}/{backcolor}", name="svg_format_forecolor_backcolor")
-     * @Route("/svg/{format}/{forecolor}/", name="svg_format_forecolor_slash")
-     * @Route("/svg/{format}/{forecolor}.{extension}", name="svg_format_forecolor_extension")
-     * @Route("/svg/{format}/{forecolor}", name="svg_format_forecolor")
-     * @Route("/svg/{format}/", name="svg_format_slash")
-     * @Route("/svg/{format}.{extension}", name="svg_format_extension")
      * @Route("/svg/{format}", name="svg_format")
+     * @Route("/svg/{format}/", name="svg_format_slash")
+     * @Route("/svg/{format}/{forecolor}", name="svg_format_forecolor")
+     * @Route("/svg/{format}/{forecolor}/", name="svg_format_forecolor_slash")
+     * @Route("/svg/{format}/{forecolor}/{backcolor}", name="svg_format_forecolor_backcolor")
+     * @Route("/svg/{format}/{forecolor}/{backcolor}/", name="svg_format_forecolor_backcolor_slash")
+     * @Route("/svg/{format}.{extension}", name="svg_format_extension")
+     * @Route("/svg/{format}/{forecolor}.{extension}", name="svg_format_forecolor_extension")
+     * @Route("/svg/{format}/{forecolor}/{backcolor}.{extension}", name="svg_format_forecolor_backcolor_extension")
      */
     public function svg(Request $request, string $format, string $forecolor = '', string $backcolor = '', string $extension = '') {
         $imageConfiguration = ImageConfiguration::getInstance();
@@ -31,7 +31,7 @@ class ImageController extends AbstractController {
             ->setType('text')
             ->setFormat($format)
             ->setForegroundColor($forecolor)
-            ->setBackgroundColor($backcolor)
+            ->setBackgroundColor($request->query->get('backcolor', $backcolor))
             ->setMimeType('image/svg+xml')
             ->setText($request->query->get('text', ''))
             ->setFont($request->query->get('font', ''))
@@ -69,15 +69,15 @@ class ImageController extends AbstractController {
     }
 
     /**
-     * @Route("/text/{format}/{forecolor}/{backcolor}.{extension}", name="text_format_forecolor_backcolor_extension")
-     * @Route("/text/{format}/{forecolor}/{backcolor}/", name="text_format_forecolor_backcolor_slash")
-     * @Route("/text/{format}/{forecolor}/{backcolor}", name="text_format_forecolor_backcolor")
-     * @Route("/text/{format}/{forecolor}/", name="text_format_forecolor_slash")
-     * @Route("/text/{format}/{forecolor}.{extension}", name="text_format_forecolor_extension")
-     * @Route("/text/{format}/{forecolor}", name="text_format_forecolor")
-     * @Route("/text/{format}/", name="text_format_slash")
-     * @Route("/text/{format}.{extension}", name="text_format_extension")
      * @Route("/text/{format}", name="text_format")
+     * @Route("/text/{format}/", name="text_format_slash")
+     * @Route("/text/{format}/{forecolor}", name="text_format_forecolor")
+     * @Route("/text/{format}/{forecolor}/", name="text_format_forecolor_slash")
+     * @Route("/text/{format}/{forecolor}/{backcolor}", name="text_format_forecolor_backcolor")
+     * @Route("/text/{format}/{forecolor}/{backcolor}/", name="text_format_forecolor_backcolor_slash")
+     * @Route("/text/{format}.{extension}", name="text_format_extension")
+     * @Route("/text/{format}/{forecolor}.{extension}", name="text_format_forecolor_extension")
+     * @Route("/text/{format}/{forecolor}/{backcolor}.{extension}", name="text_format_forecolor_backcolor_extension")
      */
     public function text(Request $request, string $format, string $forecolor = '', string $backcolor = '', string $extension = '') {
         $imageConfiguration = ImageConfiguration::getInstance();
@@ -86,7 +86,7 @@ class ImageController extends AbstractController {
             ->setType('text')
             ->setFormat($format)
             ->setForegroundColor($forecolor)
-            ->setBackgroundColor($backcolor)
+            ->setBackgroundColor($request->query->get('backcolor', $backcolor))
             ->setMimeTypeByImageExtension($extension)
             ->setText($request->query->get('text', ''))
             ->setFont($request->query->get('font', ''))
@@ -107,15 +107,15 @@ class ImageController extends AbstractController {
     }
 
     /**
-     * @Route("/image/{format}/{category}/{forecolor}/", name="image_format_category_forecolor_slash")
-     * @Route("/image/{format}/{category}/{forecolor}.{extension}", name="image_format_category_forecolor_extension")
-     * @Route("/image/{format}/{category}/{forecolor}", name="image_format_category_forecolor")
-     * @Route("/image/{format}/{category}/", name="image_format_category_slash")
-     * @Route("/image/{format}/{category}.{extension}", name="image_format_category_extension")
-     * @Route("/image/{format}/{category}", name="image_format_category")
-     * @Route("/image/{format}/", name="image_format_slash")
-     * @Route("/image/{format}.{extension}", name="image_format_extension")
      * @Route("/image/{format}", name="image_format")
+     * @Route("/image/{format}/", name="image_format_slash")
+     * @Route("/image/{format}/{category}", name="image_format_category")
+     * @Route("/image/{format}/{category}/", name="image_format_category_slash")
+     * @Route("/image/{format}/{category}/{forecolor}", name="image_format_category_forecolor")
+     * @Route("/image/{format}/{category}/{forecolor}/", name="image_format_category_forecolor_slash")
+     * @Route("/image/{format}.{extension}", name="image_format_extension")
+     * @Route("/image/{format}/{category}.{extension}", name="image_format_category_extension")
+     * @Route("/image/{format}/{category}/{forecolor}.{extension}", name="image_format_category_forecolor_extension")
      */
     public function image(Request $request, string $format, string $category = '', string $forecolor = '', string $extension = '') {
         $imageConfiguration = ImageConfiguration::getInstance();
