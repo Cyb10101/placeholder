@@ -60,7 +60,16 @@
 </div>
 
 <footer class="bg-dark text-white">
-    &copy; Cyb10101 {{ 'now'|date('Y') }}
+    <ul class="nav justify-content-center">
+        <li class="nav-item">
+            <span class="navbar-text mr-3">
+                &copy; Cyb10101 {{ 'now'|date('Y') }}
+            </span>
+        </li>
+        <li class="nav-item{% if app.request.get('_route') == 'legal-notice' %} active{% endif %}">
+            <a class="nav-link" href="{{ path('legal-notice') }}">Legal notice</a>
+        </li>
+    </ul>
 </footer>
 <script src="/build/appFooter.js"></script>
 </body></html>

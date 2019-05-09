@@ -176,6 +176,15 @@ class WebsiteController extends AbstractController {
     }
 
     /**
+     * @Route("/legal-notice", name="legal-notice")
+     * @Route("/legal-notice/", name="legal-notice_slash")
+     */
+    public function legalNotice() {
+        return $this->render('website/legal-notice.html.twig', [
+        ]);
+    }
+
+    /**
      * @Route("/", name="root")
      */
     public function root() {
