@@ -2,8 +2,7 @@ version: '3.5'
 
 services:
   web:
-    image: pluswerk/php-dev:nginx-7.2
-
+    image: cyb10101/php-dev:nginx-7.2
     volumes:
       - .:/app
       - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -18,7 +17,6 @@ services:
 
       - WEB_DOCUMENT_ROOT=/app/public
       - php.error_reporting=32767
-      - php.display_errors=1
       - php.session.gc_maxlifetime=86400
 
       # SSL: Use default cert from global-nginx-proxy
