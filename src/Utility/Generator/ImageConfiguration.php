@@ -103,6 +103,11 @@ class ImageConfiguration extends Singleton {
     protected $font = null;
 
     /**
+     * @var bool
+     */
+    protected $fontChanged = false;
+
+    /**
      * @var Image
      */
     protected $image = null;
@@ -388,12 +393,30 @@ class ImageConfiguration extends Singleton {
         } else {
             /** @var Font $font */
             $font = $this->fontRepository->findOneBy(['key' => $font]);
-            if (!$font instanceof Font) {
+            if ($font instanceof Font) {
+                $this->fontChanged = true;
+            } else {
                 $font = $this->fontRepository->findOneRandom();
                 $this->setText('! Font not found !');
             }
             $this->font = $font;
         }
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isFontChanged(): bool {
+        return $this->fontChanged;
+    }
+
+    /**
+     * @param bool $fontChanged
+     * @return self
+     */
+    public function setFontChanged($fontChanged) {
+        $this->fontChanged = $fontChanged;
         return $this;
     }
 
@@ -445,6 +468,7 @@ class ImageConfiguration extends Singleton {
             'positionChanged' => $this->positionChanged,
             'image' => '',
             'font' => '',
+            'fontChanged' => $this->fontChanged,
         ];
         if ($this->image instanceof Image) {
             $parameter['image'] = $this->image->getId();
@@ -478,7 +502,7 @@ class ImageConfiguration extends Singleton {
     public function completion() {
         // Set text
         if (empty($this->getText())) {
-            if ($this->isForegroundColorChanged() || $this->getType() !== 'image' || $this->isPositionChanged()) {
+            if ($this->isForegroundColorChanged() || $this->getType() !== 'image' || $this->isPositionChanged() || $this->isFontChanged()) {
                 $this->setText($this->getWidth() . 'x' . $this->getHeight());
             }
         }
