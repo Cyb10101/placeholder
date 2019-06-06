@@ -263,11 +263,13 @@ class ImageConfiguration extends Singleton {
      * @return self
      */
     public function setForegroundColor($foregroundColor) {
-        $color = $this->getType() === 'text' ? '#505050' : '#C8C8C8';
-        $hexColor = RequestUtility::filterHexColor($foregroundColor, $color);
-        if ($hexColor !== null) {
-            $this->foregroundColorChanged = true;
-            $this->foregroundColor = $hexColor;
+        if ($foregroundColor !== '') {
+            $color = $this->getType() === 'text' ? '#505050' : '#C8C8C8';
+            $hexColor = RequestUtility::filterHexColor($foregroundColor, $color);
+            if ($hexColor !== null) {
+                $this->foregroundColorChanged = true;
+                $this->foregroundColor = $hexColor;
+            }
         }
         return $this;
     }
