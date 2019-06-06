@@ -128,8 +128,19 @@ nav,
     }
 }
 
-footer .nav-item:not(:first-child) {
-    border-left: 1px solid rgba(255, 255, 255, 0.25);
+footer .nav .nav-item {
+    line-height: 0.5;
+
+    &:not(:first-child) {
+        border-left: 1px solid rgba(255, 255, 255, 0.25);
+    }
+}
+@include media-breakpoint-down(xs) {
+    footer .nav .nav-item {
+        &:not(:first-child) {
+            border-left: none;
+        }
+    }
 }
 
 /* Collapse toggler */
