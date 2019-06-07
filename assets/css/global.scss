@@ -75,6 +75,28 @@ footer {
     border: 2px solid #0099CC;
 }
 
+/* Text effects */
+.text-effect-3d {
+    padding-bottom: 20px;
+    font-family: "Passero One", Helvetica, sans-serif;
+    font-size: 72px;
+    color: #ffffff;
+    text-align: center;
+    text-shadow: 0 1px 0 rgb(204,204,204) , 0 2px 0 rgb(201,201,201) , 0 3px 0 rgb(187,187,187) , 0 4px 0 rgb(185,185,185) , 0 5px 0 rgb(170,170,170) , 0 6px 1px rgba(0,0,0,0.0980392) , 0 0 5px rgba(0,0,0,0.0980392) , 0 1px 3px rgba(0,0,0,0.298039) , 0 3px 5px rgba(0,0,0,0.2) , 0 5px 10px rgba(0,0,0,0.247059) , 0 10px 10px rgba(0,0,0,0.2) , 0 20px 20px rgba(0,0,0,0.14902) ;
+
+    @include media-breakpoint-down(lg) {
+        font-size: 60px;
+    }
+    @include media-breakpoint-down(md) {
+        font-size: 42px;
+    }
+    @include media-breakpoint-down(sm) {
+        font-size: 34px;
+    }
+    @include media-breakpoint-down(xs) {
+        font-size: 22px;
+    }
+}
 
 // Large devices (desktops, 992px and up)
 @media (max-width: 992px) {
