@@ -46,20 +46,47 @@ class ImageController extends AbstractController {
         $disposition = $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_INLINE, $imageConfiguration->getTitleFilename());
         $response->headers->set('Content-disposition', $disposition);
         $response->headers->set('Content-type', $imageConfiguration->getMimeType());
+
+        $fontGoogle = $imageConfiguration->getFont()->getGoogle();
+        if ($fontGoogle === '') {
+            $fontGoogle = 'Open Sans';
+        }
+        $fontExplode = explode(':', $fontGoogle);
+        $fontName = $fontExplode[0];
+        $fontWeight = (isset($fontExplode[1]) ? (int)$fontExplode[1] : 0);
+
+        $fontFile = $this->getProjectDirectory() . '/public/fonts/' . $imageConfiguration->getFont()->getFile();
+        $fileBase64 = base64_encode(\App\Utility\FileUtility::openFileOrURL($fontFile));
+
         ob_start();
         ?>
         <svg width="<?php echo $imageConfiguration->getWidth(); ?>"
              height="<?php echo $imageConfiguration->getHeight(); ?>"
              viewBox="0 0 <?php echo $imageConfiguration->getWidth(); ?> <?php echo $imageConfiguration->getHeight(); ?>"
              xmlns="http://www.w3.org/2000/svg">
+            <style type="text/css">
+                @font-face {
+                    font-family: '<?php echo $fontName; ?>';
+                    <?php echo ($fontWeight > 0 ? 'font-weight: ' . $fontWeight . ';' : ''); ?>
+                    src: local('<?php echo $fontName; ?>'),
+                        url('data:application/octet-stream;charset=utf-8;base64,<?php echo $fileBase64; ?>');
+                }
+            </style>
             <defs>
                 <style type="text/css">
-                    @import url('https://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic');
+                    /*@import url('https://fonts.googleapis.com/css?family=*/<?php echo urlencode($fontGoogle); ?>/*&amp;display=swap');*/
                 </style>
             </defs>
-            <rect x="0" y="0" width="<?php echo $imageConfiguration->getWidth(); ?>" height="<?php echo $imageConfiguration->getHeight(); ?>" style="fill:<?php echo $imageConfiguration->getBackgroundColor(); ?>;stroke:<?php echo $imageConfiguration->getForegroundColor(); ?>;stroke-width:<?php echo ($imageConfiguration->getBorder() * 2); ?>"/>
-            <text x="50%" y="50%" font-size="<?php echo $fontSize; ?>px" text-anchor="middle" dominant-baseline="middle" font-family="Roboto, monospace, sans-serif" fill="<?php echo $imageConfiguration->getForegroundColor(); ?>">
-                <?php echo $imageConfiguration->getWidth(); ?>×<?php echo $imageConfiguration->getHeight(); ?>
+            <rect x="0" y="0"
+                  width="<?php echo $imageConfiguration->getWidth(); ?>"
+                  height="<?php echo $imageConfiguration->getHeight(); ?>"
+                  style="fill:<?php echo $imageConfiguration->getBackgroundColor(); ?>;stroke:<?php echo $imageConfiguration->getForegroundColor(); ?>;stroke-width:<?php echo ($imageConfiguration->getBorder() * 2); ?>">
+            </rect>
+            <text x="50%" y="50%" font-size="<?php echo $fontSize; ?>px" text-anchor="middle"
+                  <?php echo ($fontWeight > 0 ? ' font-weight="' . $fontWeight . '" ' : ''); ?>
+                  dominant-baseline="middle" font-family="<?php echo $fontName; ?>, monospace, sans-serif"
+                  fill="<?php echo $imageConfiguration->getForegroundColor(); ?>">
+                <?php echo $imageConfiguration->getText(); ?>
             </text>
         </svg>
         <?php

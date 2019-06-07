@@ -29,6 +29,12 @@ class Font {
     private $file = '';
 
     /**
+     * @var string
+     * @ORM\Column(type="string", length=191, nullable=false)
+     */
+    private $google = '';
+
+    /**
      * @var Licence
      * @ORM\ManyToOne(targetEntity="App\Entity\Licence")
      * @ORM\JoinColumn(name="licence", referencedColumnName="id")
@@ -80,6 +86,22 @@ class Font {
      */
     public function setFile($file) {
         $this->file = $file;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getGoogle(): string {
+        return $this->google;
+    }
+
+    /**
+     * @param string $google
+     * @return self
+     */
+    public function setGoogle($google) {
+        $this->google = $google;
         return $this;
     }
 
