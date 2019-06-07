@@ -56,7 +56,8 @@ class ImageController extends AbstractController {
         $textX = '50%'; $textY = '50%';
         $fontSize = min($imageConfiguration->getWidth() * 0.2, $imageConfiguration->getHeight() * 0.6);
         if ($imageConfiguration->getPosition() === 'vertical-left') {
-            $textX = '-71%'; $textY = '1em';
+            $textX = $imageConfiguration->getBorder() + 5;
+            $textY = $imageConfiguration->getHeight() - $imageConfiguration->getBorder() - 10;
             $fontSize = min($imageConfiguration->getWidth() * 0.08, $imageConfiguration->getHeight());
         }
 
@@ -94,16 +95,18 @@ class ImageController extends AbstractController {
                   if ($imageConfiguration->getPosition() === 'vertical-left') {
                       ?>
                       text-anchor="start"
-                      transform="rotate(-90)"
+                      transform="rotate(-90, <?php echo $textX . ', ' . $textY; ?>)"
+                      dominant-baseline="hanging"
                       <?php
                   } else {
                       ?>
                       text-anchor="middle"
+                      dominant-baseline="middle"
                       <?php
                   }
                   echo ($fontWeight > 0 ? ' font-weight="' . $fontWeight . '" ' : '');
                   ?>
-                  dominant-baseline="middle" font-family="<?php echo $fontName; ?>, monospace, sans-serif"
+                  font-family="<?php echo $fontName; ?>, monospace, sans-serif"
                   fill="<?php echo $imageConfiguration->getForegroundColor(); ?>">
                 <?php echo $imageConfiguration->getText(); ?>
             </text>
