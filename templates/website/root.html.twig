@@ -20,7 +20,7 @@
                     <h4>Dimension</h4>
 
                     <div class="row">
-                        <div class="col-6 text-center">
+                        <div class="col-md-6 col-sm-12 text-center">
                             <label>Format</label>
                             <select name="format" id="format" class="form-control">
                                 <option value="width-height" selected>Width & Height</option>
@@ -33,11 +33,11 @@
                                 {% endif %}
                             </select>
                         </div>
-                        <div class="col-3 text-center">
+                        <div class="col-md-3 col-sm-12 text-center">
                             <label>Width</label>
                             <input type="text" name="width" id="width" class="form-control" value="400">
                         </div>
-                        <div class="col-3 text-center">
+                        <div class="col-md-3 col-sm-12 text-center">
                             <label>Height</label>
                             <input type="text" name="height" id="height" class="form-control" value="300">
                         </div>
@@ -61,15 +61,15 @@
                     <h4>Color</h4>
 
                     <div class="row">
-                        <div class="col-4 text-center">
+                        <div class="col-lg-4 col-sm-12 text-center">
                             <input type="checkbox" name="useForeColor" id="useForeColor"> <label for="useForeColor">Forecolor</label>
                             <input type="color" name="forecolor" id="forecolor" class="form-control" value="#505050">
 
                         </div>
-                        <div class="col-4 text-center switch-color">
+                        <div class="col-lg-4 col-sm-12 text-center switch-color mt-2 align-self-center">
                             <button name="switch-color" id="switch-color" class="btn btn-primary btn-sm">&lt;== Switch ==&gt;</button>
                         </div>
-                        <div class="col-4 text-center backcolor">
+                        <div class="col-lg-4 col-sm-12 text-center backcolor">
                             <input type="checkbox" name="useBackColor" id="useBackColor"> <label for="useBackColor">Backcolor</label>
                             <input type="color" name="backcolor" id="backcolor" class="form-control" value="#C8C8C8">
                         </div>
@@ -79,14 +79,14 @@
             <div class="row mb-3">
                 <div class="col-8 offset-2 text-center">
                     <div class="row">
-                        <div class="col-4 text-center">
+                        <div class="col-lg-4 col-sm-12 text-center">
                             <h4>Text position</h4>
                             <select name="position" id="position" class="form-control">
                                 <option value="" selected>-- Default: Center --</option>
                                 <option value="vertical-left">Vertical left</option>
                             </select>
                         </div>
-                        <div class="col-4 text-center">
+                        <div class="col-lg-4 col-sm-12 text-center">
                             <h4>Font</h4>
                             <select name="font" id="font" class="form-control">
                                 <option value="" selected>Random</option>
@@ -97,7 +97,7 @@
                                 {% endif %}
                             </select>
                         </div>
-                        <div class="col-4 text-center">
+                        <div class="col-lg-4 col-sm-12 text-center">
                             <h4>Border</h4>
                             <select name="border" id="border" class="form-control">
                                 <option value="0" selected>None</option>
