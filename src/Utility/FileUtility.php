@@ -6,6 +6,20 @@ namespace App\Utility;
  */
 abstract class FileUtility {
     /**
+     * @param string $filenameOrURL
+     * @return string
+     */
+    public static function openFileOrURL(string $filenameOrURL) {
+        $handle = fopen($filenameOrURL, 'rb');
+        $content = '';
+        while (!feof($handle)) {
+            $content .= fread($handle, 1024);
+        }
+        fclose($handle);
+        return $content;
+    }
+
+    /**
      * Get max upload size
      * @return int
      */
