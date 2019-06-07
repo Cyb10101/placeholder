@@ -332,6 +332,7 @@ abstract class FileUtility {
             'image/ief' => 'ief',
             'image/jpeg' => 'jpg',
             'image/png' => 'png',
+            'image/svg+xml' => 'svg',
             'image/vnd.wap.wbmp' => 'wbmp',
             'image/x-cmu-raster' => 'ras',
             'image/x-portable-anymap' => 'pnm',
