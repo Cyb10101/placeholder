@@ -199,6 +199,18 @@ CYB.CybProject.UrlSwitcher = function () {
                     urlParts.push('backcolor=' + backcolor.substring(1));
                 }
             }
+        } if (type === 'svg') {
+            if (useForeColor) {
+                url += forecolor.substring(1) + '/';
+
+                if (useBackColor) {
+                    url += backcolor.substring(1) + '/';
+                }
+            } else {
+                if (useBackColor) {
+                    urlParts.push('backcolor=' + backcolor.substring(1));
+                }
+            }
         }
 
         if (text !== '') {
