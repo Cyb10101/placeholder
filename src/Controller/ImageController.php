@@ -40,13 +40,7 @@ class ImageController extends AbstractController {
             ->completion()
         ;
 
-        $fontSize = min($imageConfiguration->getWidth() * 0.2, $imageConfiguration->getHeight() * 0.6);
-
-        $response = new Response();
-        $disposition = $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_INLINE, $imageConfiguration->getTitleFilename());
-        $response->headers->set('Content-disposition', $disposition);
-        $response->headers->set('Content-type', $imageConfiguration->getMimeType());
-
+        // Font
         $fontGoogle = $imageConfiguration->getFont()->getGoogle();
         if ($fontGoogle === '') {
             $fontGoogle = 'Open Sans';
@@ -58,6 +52,19 @@ class ImageController extends AbstractController {
         $fontFile = $this->getProjectDirectory() . '/public/fonts/' . $imageConfiguration->getFont()->getFile();
         $fileBase64 = base64_encode(\App\Utility\FileUtility::openFileOrURL($fontFile));
 
+        // General
+        $textX = '50%'; $textY = '50%';
+        $fontSize = min($imageConfiguration->getWidth() * 0.2, $imageConfiguration->getHeight() * 0.6);
+        if ($imageConfiguration->getPosition() === 'vertical-left') {
+            $textX = '-71%'; $textY = '1em';
+            $fontSize = min($imageConfiguration->getWidth() * 0.08, $imageConfiguration->getHeight());
+        }
+
+        // Output
+        $response = new Response();
+        $disposition = $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_INLINE, $imageConfiguration->getTitleFilename());
+        $response->headers->set('Content-disposition', $disposition);
+        $response->headers->set('Content-type', $imageConfiguration->getMimeType());
         ob_start();
         ?>
         <svg width="<?php echo $imageConfiguration->getWidth(); ?>"
@@ -82,8 +89,20 @@ class ImageController extends AbstractController {
                   height="<?php echo $imageConfiguration->getHeight(); ?>"
                   style="fill:<?php echo $imageConfiguration->getBackgroundColor(); ?>;stroke:<?php echo $imageConfiguration->getForegroundColor(); ?>;stroke-width:<?php echo ($imageConfiguration->getBorder() * 2); ?>">
             </rect>
-            <text x="50%" y="50%" font-size="<?php echo $fontSize; ?>px" text-anchor="middle"
-                  <?php echo ($fontWeight > 0 ? ' font-weight="' . $fontWeight . '" ' : ''); ?>
+            <text x="<?php echo $textX; ?>" y="<?php echo $textY; ?>" font-size="<?php echo $fontSize; ?>px"
+                  <?php
+                  if ($imageConfiguration->getPosition() === 'vertical-left') {
+                      ?>
+                      text-anchor="start"
+                      transform="rotate(-90)"
+                      <?php
+                  } else {
+                      ?>
+                      text-anchor="middle"
+                      <?php
+                  }
+                  echo ($fontWeight > 0 ? ' font-weight="' . $fontWeight . '" ' : '');
+                  ?>
                   dominant-baseline="middle" font-family="<?php echo $fontName; ?>, monospace, sans-serif"
                   fill="<?php echo $imageConfiguration->getForegroundColor(); ?>">
                 <?php echo $imageConfiguration->getText(); ?>
