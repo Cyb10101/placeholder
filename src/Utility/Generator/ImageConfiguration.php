@@ -228,10 +228,12 @@ class ImageConfiguration extends Singleton {
      * @return self
      */
     public function setCategory($category) {
-        if (in_array($category, $this->imageRepository->getCategories())) {
-            $this->category = $category;
-        } else {
-            $this->setText('! Category not found !');
+        if ($category !== '') {
+            if (in_array($category, $this->imageRepository->getCategories())) {
+                $this->category = $category;
+            } else {
+                $this->setText('! Category not found !');
+            }
         }
         return $this;
     }
