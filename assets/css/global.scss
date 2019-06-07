@@ -179,3 +179,11 @@ footer .nav .nav-item {
 .radio-toolbar input[type="radio"]:checked + label {
     background-color: #183869;
 }
+
+/* Card with links */
+.card-linked,
+.card-linked:hover {
+    display: block;
+    color: #212529;
+    text-decoration: none;
+}

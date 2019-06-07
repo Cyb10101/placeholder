@@ -81,16 +81,16 @@
                 {% if examplesTexts|length > 0 %}
                     <div class="row">
                         {% for item in examplesTexts %}
-                            <div class="col-lg-3 col-md-4 col-sm-6 mb-3">
-                                <a href="{{ item.url }}" target="_blank">
-                                    <div class="card">
+                            <div class="col-lg-3 col-md-4 col-sm-6 mb-3 d-flex align-items-stretch">
+                                <div class="card flex-fill">
+                                    <a href="{{ item.url }}" target="_blank" class="card-linked">
                                         <img class="card-img-top" src="{{ item.url }}" alt="{{ item.title }}">
                                         <div class="card-body">
                                             <h5 class="card-title">{{ item.title }}</h5>
-                                            <p class="card-text">{{ item.title }}</p>
+                                            <p class="card-text">{{ item.description }}</p>
                                         </div>
-                                    </div>
-                                </a>
+                                    </a>
+                                </div>
                             </div>
                         {% endfor %}
                     </div>
@@ -103,16 +103,16 @@
                 {% if examplesSvgs|length > 0 %}
                     <div class="row">
                         {% for item in examplesSvgs %}
-                            <div class="col-lg-3 col-md-4 col-sm-6 mb-3">
-                                <a href="{{ item.url }}" target="_blank">
-                                    <div class="card">
+                            <div class="col-lg-3 col-md-4 col-sm-6 mb-3 d-flex align-items-stretch">
+                                <div class="card flex-fill">
+                                    <a href="{{ item.url }}" target="_blank" class="card-linked">
                                         <img class="card-img-top" src="{{ item.url }}" alt="{{ item.title }}">
                                         <div class="card-body">
                                             <h5 class="card-title">{{ item.title }}</h5>
-                                            <p class="card-text">{{ item.title }}</p>
+                                            <p class="card-text">{{ item.description }}</p>
                                         </div>
-                                    </div>
-                                </a>
+                                    </a>
+                                </div>
                             </div>
                         {% endfor %}
                     </div>
@@ -125,16 +125,16 @@
                 {% if examplesImages|length > 0 %}
                     <div class="row">
                         {% for item in examplesImages %}
-                            <div class="col-lg-3 col-md-4 col-sm-6 mb-3">
-                                <a href="{{ item.url }}" target="_blank">
-                                    <div class="card">
+                            <div class="col-lg-3 col-md-4 col-sm-6 mb-3 d-flex align-items-stretch">
+                                <div class="card flex-fill">
+                                    <a href="{{ item.url }}" target="_blank" class="card-linked">
                                         <img class="card-img-top" src="{{ item.url }}" alt="{{ item.title }}">
                                         <div class="card-body">
                                             <h5 class="card-title">{{ item.title }}</h5>
-                                            <p class="card-text">{{ item.title }}</p>
+                                            <p class="card-text">{{ item.description }}</p>
                                         </div>
-                                    </div>
-                                </a>
+                                    </a>
+                                </div>
                             </div>
                         {% endfor %}
                     </div>
