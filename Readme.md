@@ -29,9 +29,6 @@ DATABASE_URL=mysql://root:root@global-db/netslum_placeholder
 
 # Docker-Global mail
 MAILER_URL=smtp://global-mail:1025
-
-# Set email for contact
-CONTACT_MAIL=email@example.org
 ```
 
 ## Development

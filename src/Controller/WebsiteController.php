@@ -4,9 +4,11 @@ namespace App\Controller;
 use App\Entity\Font;
 use App\Entity\Format;
 use App\Entity\Image;
+use App\Entity\Setting;
 use App\Repository\FontRepository;
 use App\Repository\FormatRepository;
 use App\Repository\ImageRepository;
+use App\Repository\SettingRepository;
 use App\Traits\ControllerTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -203,7 +205,10 @@ class WebsiteController extends AbstractController {
             return $this->forward(self::class . '::contact');
         }
 
-        $toMail = getenv('CONTACT_MAIL');
+        /** @var SettingRepository $settingRepository */
+        $settingRepository = $this->getDoctrine()->getRepository(Setting::class);
+
+        $toMail = $settingRepository->getSetting('contactEmail');
         if (empty($toMail)) {
             throw new \Exception('Contact not properly set.');
         }
@@ -253,7 +258,14 @@ class WebsiteController extends AbstractController {
      * @Route("/legal-notice/", name="legal-notice_slash")
      */
     public function legalNotice() {
+        /** @var SettingRepository $settingRepository */
+        $settingRepository = $this->getDoctrine()->getRepository(Setting::class);
+
         return $this->render('website/legal-notice.html.twig', [
+            'imprintName' => $settingRepository->getSetting('imprintName'),
+            'imprintAddress' => $settingRepository->getSetting('imprintAddress'),
+            'imprintPhone' => $settingRepository->getSetting('imprintPhone'),
+            'imprintEmail' => $settingRepository->getSetting('imprintEmail'),
         ]);
     }
 
