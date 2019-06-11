@@ -90,9 +90,6 @@
     "ocramius/proxy-manager": {
         "version": "2.2.2"
     },
-    "phpsu/phpsu": {
-        "version": "1.0.0-beta4"
-    },
     "psr/cache": {
         "version": "1.0.1"
     },
@@ -101,9 +98,6 @@
     },
     "psr/log": {
         "version": "1.1.0"
-    },
-    "psr/simple-cache": {
-        "version": "1.0.1"
     },
     "sensio/framework-extra-bundle": {
         "version": "5.2",
@@ -122,6 +116,9 @@
     },
     "symfony/cache": {
         "version": "v4.2.7"
+    },
+    "symfony/cache-contracts": {
+        "version": "v1.1.1"
     },
     "symfony/config": {
         "version": "v4.2.7"
@@ -156,6 +153,9 @@
     },
     "symfony/event-dispatcher": {
         "version": "v4.2.7"
+    },
+    "symfony/event-dispatcher-contracts": {
+        "version": "v1.1.1"
     },
     "symfony/filesystem": {
         "version": "v4.2.7"
@@ -200,6 +200,9 @@
     "symfony/http-kernel": {
         "version": "v4.2.7"
     },
+    "symfony/mime": {
+        "version": "v4.3.1"
+    },
     "symfony/orm-pack": {
         "version": "v1.0.6"
     },
@@ -212,8 +215,8 @@
     "symfony/polyfill-php72": {
         "version": "v1.11.0"
     },
-    "symfony/process": {
-        "version": "v4.2.7"
+    "symfony/polyfill-php73": {
+        "version": "v1.11.0"
     },
     "symfony/profiler-pack": {
         "version": "v1.0.4"
@@ -232,6 +235,9 @@
             "config/packages/test/routing.yaml",
             "config/routes.yaml"
         ]
+    },
+    "symfony/service-contracts": {
+        "version": "v1.1.2"
     },
     "symfony/stopwatch": {
         "version": "v4.2.7"
