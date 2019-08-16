@@ -256,6 +256,9 @@
             "config/packages/test/swiftmailer.yaml"
         ]
     },
+    "symfony/translation-contracts": {
+        "version": "v1.1.5"
+    },
     "symfony/twig-bridge": {
         "version": "v4.2.7"
     },
