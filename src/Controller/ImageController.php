@@ -152,6 +152,7 @@ class ImageController extends AbstractController {
             $generateImageUtility->createText();
         }
 
+        $this->cleanCacheDirectory();
         return $this->file($fileGenerated, $imageConfiguration->getTitleFilename(), ResponseHeaderBag::DISPOSITION_INLINE);
     }
 
@@ -190,6 +191,28 @@ class ImageController extends AbstractController {
             $generateImageUtility->createImage();
         }
 
+        $this->cleanCacheDirectory();
         return $this->file($fileGenerated, $imageConfiguration->getTitleFilename(), ResponseHeaderBag::DISPOSITION_INLINE);
+    }
+
+    /**
+     * @return void
+     */
+    protected function cleanCacheDirectory() {
+        $filesystem = new \Symfony\Component\Filesystem\Filesystem();
+
+        $finder = new \Symfony\Component\Finder\Finder();
+        $finder->files()->in($this->getCacheDirectory())->depth(0)
+            ->date('< now - 30 days')
+            ->name('/\.(jpe?g|png|gif|bmp|svg)$/i');
+
+        /** @var \Symfony\Component\Finder\SplFileInfo $file */
+        foreach ($finder as $file) {
+            $fileAbsolute = $file->getPathname();
+
+            if ($filesystem->exists($fileAbsolute)) {
+                $filesystem->remove($fileAbsolute);
+            }
+        }
     }
 }
