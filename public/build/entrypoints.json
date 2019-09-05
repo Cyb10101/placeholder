@@ -7,11 +7,6 @@
       "js": [
         "/build/app.js"
       ]
-    },
-    "appFooter": {
-      "js": [
-        "/build/appFooter.js"
-      ]
     }
   }
 }
