@@ -8,4 +8,4 @@ require('bootstrap');
 
 require('./javascript.js');
 require('./fullscreen.js');
-// require('./0-top/javascript.js');
+require('./url-switcher.js');

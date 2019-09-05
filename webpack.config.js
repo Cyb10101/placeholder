@@ -10,7 +10,6 @@ Encore
 
     // will create public/build/app.js and public/build/app.css
     .addEntry('app', './assets/js/app.js')
-    .addEntry('appFooter', './assets/js/appFooter.js')
     // .addStyleEntry('app', './assets/css/app.scss')
 
     .enableSassLoader()
