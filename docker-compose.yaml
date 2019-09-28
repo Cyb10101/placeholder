@@ -12,8 +12,8 @@ services:
 
     environment:
       - VIRTUAL_HOST=~^placeholder\.netslum\.(vm|vmd)$$
-      - VIRTUAL_PROTO=https
-      - VIRTUAL_PORT=443
+      #- VIRTUAL_PROTO=https
+      #- VIRTUAL_PORT=443
 
       - WEB_DOCUMENT_ROOT=/app/public
       - php.error_reporting=32767
