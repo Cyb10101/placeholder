@@ -1,11 +1,11 @@
-// Symfony said require scss
-require('../css/app.scss');
+import style from '../css/app.scss';
 
-/* fix for https://github.com/symfony/webpack-encore/pull/54 */
-global.$ = global.jQuery = require('jquery');
+import $ from 'jquery';
+global.$ = global.jQuery = $; // Make jQuery global
 
-require('bootstrap');
+import 'popper.js';
+import 'bootstrap';
 
-require('./javascript.js');
-require('./fullscreen.js');
-require('./url-switcher.js');
+import './javascript.js';
+import './fullscreen.js';
+import './url-switcher.js';
