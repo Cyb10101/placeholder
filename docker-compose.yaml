@@ -2,7 +2,7 @@ version: '3.5'
 
 services:
   web:
-    image: cyb10101/php-dev:nginx-7.3
+    image: cyb10101/php-dev:nginx-7.4
     volumes:
       - .:/app
       - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -12,8 +12,8 @@ services:
 
     environment:
       - VIRTUAL_HOST=~^placeholder\.netslum\.(vm|vmd)$$
-      #- VIRTUAL_PROTO=https
-      #- VIRTUAL_PORT=443
+      - VIRTUAL_PROTO=https
+      - VIRTUAL_PORT=443
 
       - WEB_DOCUMENT_ROOT=/app/public
       - php.error_reporting=32767
