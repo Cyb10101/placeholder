@@ -10,6 +10,7 @@ use App\Repository\FormatRepository;
 use App\Repository\ImageRepository;
 use App\Repository\SettingRepository;
 use App\Traits\ControllerTrait;
+use App\Utility\RecaptchaUtility;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -188,6 +189,10 @@ class WebsiteController extends AbstractController {
         $email = $request->request->get('email', '');
         $subject = 'Request from Placeholder';
         $message = $request->request->get('message', '');
+        $token = $request->request->get('token', '');
+
+        /** @var RecaptchaUtility $recaptcha */
+        $recaptcha = RecaptchaUtility::getInstance();
 
         if (empty($name)) {
             $error = true;
@@ -200,6 +205,10 @@ class WebsiteController extends AbstractController {
         if (empty($message)) {
             $error = true;
             $this->addFlash('danger', 'Message is required');
+        }
+        if ($this->isProduction() && (empty($token) || !$recaptcha->verify($token))) {
+            $error = true;
+            $this->addFlash('danger', 'Google reCAPTCHA invalid');
         }
         if ($error) {
             return $this->forward(self::class . '::contact');
@@ -246,10 +255,17 @@ class WebsiteController extends AbstractController {
         $email = $request->request->get('email', '');
         $message = $request->request->get('message', '');
 
+        /** @var RecaptchaUtility $recaptcha */
+        $recaptcha = RecaptchaUtility::getInstance();
+
         return $this->render('website/contact.html.twig', [
             'name' => $name,
             'email' => $email,
             'message' => $message,
+            'recaptcha' => [
+                'siteKey' => $recaptcha->getSiteKey()
+            ],
+            'isProduction' => $this->isProduction(),
         ]);
     }
 
