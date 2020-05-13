@@ -1,11 +1,10 @@
-import style from '../css/app.scss';
+import '../css/app.scss';
 
-import $ from 'jquery';
-global.$ = global.jQuery = $; // Make jQuery global
+global.$ = global.jQuery = require('jquery');
 
-import 'popper.js';
-import 'bootstrap';
+require('popper.js');
+require('bootstrap');
 
-import './javascript.js';
-import './fullscreen.js';
-import './url-switcher.js';
+require('./javascript.js');
+require('./fullscreen.js');
+require('./url-switcher.js');
