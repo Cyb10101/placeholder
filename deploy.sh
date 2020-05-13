@@ -42,9 +42,9 @@ checkGitMaster
 checkGit
 askDeploy
 
-BIN_PHP=${BIN_PHP:-php}
-BIN_COMPOSER={BIN_COMPOSER:-composer}
 loadEnvironmentVariables
+BIN_PHP=${BIN_PHP:-php}
+BIN_COMPOSER=${BIN_COMPOSER:-composer}
 
 # Git
 git pull origin master
