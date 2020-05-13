@@ -1,5 +1,21 @@
 {% extends 'base.html.twig' %}
 
+{% block head %}
+    {% if isProduction %}
+        <script src="https://www.google.com/recaptcha/api.js?render={{ recaptcha.siteKey }}"></script>
+        <script>
+            grecaptcha.ready(function() {
+                grecaptcha.execute('{{ recaptcha.siteKey }}', {action: 'homepage'}).then(function(token) {
+                    let recaptchaToken = document.getElementById('recaptcha-token');
+                    if (recaptchaToken) {
+                        recaptchaToken.value = token;
+                    }
+                });
+            });
+        </script>
+    {% endif %}
+{% endblock %}
+
 {% block body %}
     <div class="container section-contact">
         <div class="col-12">
@@ -16,6 +32,7 @@
             </div>
             <div class="col-12">
                 <form action="{{ path('contact_send') }}" name="contact" method="post">
+                    <input type="hidden" id="recaptcha-token" name="token" value="">
                     <div class="form-group">
                         <label for="name">Name *</label>
                         <input type="text" name="name" id="name" class="form-control" value="{{ name }}" required>
@@ -26,7 +43,7 @@
                     </div>
                     <div class="form-group">
                         <label for="message">Message *</label>
-                        <textarea name="message" id="message" class="form-control" value="{{ message }}" rows="8" required></textarea>
+                        <textarea name="message" id="message" class="form-control" rows="8" required>{{ message }}</textarea>
                     </div>
                     <div class="form-group centered">
                         <p><small class="text-muted">* Required</small></p>
