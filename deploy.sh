@@ -42,8 +42,8 @@ checkGitMaster
 checkGit
 askDeploy
 
-BIN_PHP=php
-BIN_COMPOSER=composer
+BIN_PHP=/usr/bin/php74
+BIN_COMPOSER=~/bin/composer
 loadEnvironmentVariables
 
 # Git
