@@ -43,14 +43,12 @@ checkGit
 askDeploy
 
 loadEnvironmentVariables
-BIN_PHP=${BIN_PHP:-php}
-BIN_COMPOSER=${BIN_COMPOSER:-composer}
+BIN_PHP="${BIN_PHP:-php}"
+BIN_COMPOSER="${BIN_COMPOSER:-composer}"
 
-# Git
+# Git & Composer
 git pull origin master
-
-# Composer
-${BIN_PHP} ${BIN_COMPOSER} install --ignore-platform-reqs
+${BIN_PHP} ${BIN_COMPOSER} install
 
 # Update database schema
 read -p 'Update database schema? [y/N] ' -n 1 -r
