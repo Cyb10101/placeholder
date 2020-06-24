@@ -5,7 +5,6 @@
 ```bash
 composer create-project symfony/skeleton .
 composer require annotations doctrine mailer twig twig/extensions
-composer require --dev profiler phpsu/phpsu
 ```
 
 ### Database
