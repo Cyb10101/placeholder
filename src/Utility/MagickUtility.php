@@ -263,6 +263,17 @@ class MagickUtility extends Singleton {
         return $this;
     }
 
+    /**
+     * @param int $quality
+     * @return MagickUtility
+     */
+    public function quality(int $quality): MagickUtility {
+        $this->addStacks([
+            '-quality ' . $quality,
+        ]);
+        return $this;
+    }
+
     protected function createCommandException() {
         throw new \Exception('Command not working: ' . PHP_EOL . $this->lastCommand);
     }

@@ -64,6 +64,7 @@ class GenerateImageUtility {
             $this->imageConfiguration->getWidth(), $this->imageConfiguration->getHeight(),
             $this->imageConfiguration->getBackgroundColor()
         );
+        $this->magickUtility->quality(100);
 
         $this->drawText();
 
@@ -84,6 +85,7 @@ class GenerateImageUtility {
         if ($imageFile !== null) {
             $this->magickUtility
                 ->addInputFile($imageFile)
+                ->quality(100)
                 ->thumbnailCut($this->imageConfiguration->getWidth(), $this->imageConfiguration->getHeight());
 
             $this->drawText();
