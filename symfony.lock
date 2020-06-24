@@ -75,11 +75,11 @@
     "doctrine/reflection": {
         "version": "v1.0.0"
     },
+    "doctrine/sql-formatter": {
+        "version": "1.1.0"
+    },
     "egulias/email-validator": {
         "version": "2.1.7"
-    },
-    "jdorn/sql-formatter": {
-        "version": "v1.2.17"
     },
     "laminas/laminas-zendframework-bridge": {
         "version": "1.0.3"
@@ -148,6 +148,9 @@
     "symfony/dependency-injection": {
         "version": "v4.2.7"
     },
+    "symfony/deprecation-contracts": {
+        "version": "v2.1.2"
+    },
     "symfony/doctrine-bridge": {
         "version": "v4.2.7"
     },
@@ -207,13 +210,19 @@
         "version": "v4.2.7"
     },
     "symfony/mime": {
-        "version": "v4.3.1"
+        "version": "v5.1.2"
     },
     "symfony/orm-pack": {
         "version": "v1.0.6"
     },
+    "symfony/polyfill-intl-grapheme": {
+        "version": "v1.17.1"
+    },
     "symfony/polyfill-intl-idn": {
         "version": "v1.11.0"
+    },
+    "symfony/polyfill-intl-normalizer": {
+        "version": "v1.17.1"
     },
     "symfony/polyfill-mbstring": {
         "version": "v1.11.0"
@@ -223,6 +232,9 @@
     },
     "symfony/polyfill-php73": {
         "version": "v1.11.0"
+    },
+    "symfony/polyfill-php80": {
+        "version": "v1.17.1"
     },
     "symfony/profiler-pack": {
         "version": "v1.0.4"
@@ -247,6 +259,9 @@
     },
     "symfony/stopwatch": {
         "version": "v4.2.7"
+    },
+    "symfony/string": {
+        "version": "v5.1.2"
     },
     "symfony/swiftmailer-bundle": {
         "version": "2.5",
