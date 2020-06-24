@@ -1,6 +1,7 @@
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin');
+const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 
 module.exports = (env, argv) => {
     const devMode = argv.mode === 'development';
@@ -51,7 +52,8 @@ module.exports = (env, argv) => {
             }),
             new FriendlyErrorsWebpackPlugin({
                 clearConsole: false
-            })
+            }),
+            new CleanWebpackPlugin()
         ],
         performance: {
             hints: false
