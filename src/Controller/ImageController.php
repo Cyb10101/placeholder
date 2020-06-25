@@ -82,7 +82,7 @@ class ImageController extends AbstractController {
             </style>
             <defs>
                 <style type="text/css">
-                    /*@import url('https://fonts.googleapis.com/css?family=*/<?php echo urlencode($fontGoogle); ?>/*&amp;display=swap');*/
+                    /*@import url('https://fonts.googleapis.com/css?family=<?php echo urlencode($fontGoogle); ?>&amp;display=swap');*/
                 </style>
             </defs>
             <rect x="0" y="0"
