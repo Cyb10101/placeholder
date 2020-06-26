@@ -1,15 +1,6 @@
 <?php
 namespace App\Traits;
 
-use App\Entity\Font;
-use App\Entity\Format;
-use App\Entity\Image;
-use App\Repository\FontRepository;
-use App\Repository\FormatRepository;
-use App\Repository\ImageRepository;
-use App\Utility\FileUtility;
-use App\Utility\GeneralUtility;
-use App\Utility\RequestUtility;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
