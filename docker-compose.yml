@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  web:
+    image: webdevops/php-apache:7.4
+    restart: always
+    hostname: placeholder
+    volumes:
+      - .:/app
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+    environment:
+      - VIRTUAL_HOST=placeholder.netslum.de
+      - VIRTUAL_PROTO=https
+      - VIRTUAL_PORT=443
+      - LETSENCRYPT_HOST=placeholder.netslum.de
+
+      - WEB_DOCUMENT_ROOT=/app/public
+    working_dir: /app
+
+networks:
+  default:
+    external:
+      name: global
