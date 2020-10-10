@@ -6,12 +6,6 @@ APPLICATION_GID=${APPLICATION_GID:-1000}
 APPLICATION_USER=${APPLICATION_USER:-application}
 APPLICATION_GROUP=${APPLICATION_GROUP:-application}
 
-# Fix special user permissions
-#if [ "$(id -u)" != "1000" ]; then
-#    grep -q '^APPLICATION_UID_OVERRIDE=' .env && sed -i 's/^APPLICATION_UID_OVERRIDE=.*/APPLICATION_UID_OVERRIDE='$(id -u)'/' .env || echo 'APPLICATION_UID_OVERRIDE='$(id -u) >> .env
-#    grep -q '^APPLICATION_GID_OVERRIDE=' .env && sed -i 's/^APPLICATION_GID_OVERRIDE=.*/APPLICATION_GID_OVERRIDE='$(id -g)'/' .env || echo 'APPLICATION_GID_OVERRIDE='$(id -g) >> .env
-#fi;
-
 # Load environment file
 if [ -f .env ]; then
   source .env
@@ -67,11 +61,15 @@ askDeploy() {
     fi
 }
 
+setPermissions() {
+    chown -R ${APPLICATION_UID}:${APPLICATION_GID} .
+    find . -type d -exec chmod ugo+rx,ug+w {} \;
+    find . -type f -exec chmod ugo+r,ug+w {} \;
+}
+
 runDeploy() {
     git pull origin master
-
-    # Set user permissions
-    chown -R ${APPLICATION_UID}:${APPLICATION_GID} .
+    setPermissions
 
     # Git: Deploy as user in container (SSH-Key for private repositories needed)
     #startFunction exec-web git pull origin master
