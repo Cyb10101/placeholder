@@ -7,7 +7,6 @@ services:
     hostname: placeholder
     volumes:
       - .:/app
-      - /var/run/docker.sock:/var/run/docker.sock:ro
 
     environment:
       - VIRTUAL_HOST=placeholder.netslum.de
