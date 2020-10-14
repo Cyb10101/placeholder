@@ -1,28 +1,46 @@
 #!/usr/bin/env bash
 
 SCRIPTPATH="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+cd "${SCRIPTPATH}"
+
 APPLICATION_UID=${APPLICATION_UID:-1000}
 APPLICATION_GID=${APPLICATION_GID:-1000}
 APPLICATION_USER=${APPLICATION_USER:-application}
 APPLICATION_GROUP=${APPLICATION_GROUP:-application}
 
-# Load environment file
-if [ -f .env ]; then
-  source .env
-fi
-if [ -f .env.local ]; then
-  source .env.local
-fi
+loadEnvironmentVariables() {
+    if [ -f ".env" ]; then
+      source .env
+    fi
+    if [ -f ".env.local" ]; then
+      source .env.local
+    fi
+}
 
-# Select docker compose file
-APP_ENV=${APP_ENV:-}
-DOCKER_COMPOSE_FILE=docker-compose.yml
-if [ "${APP_ENV}" == "dev" ]; then
-  DOCKER_COMPOSE_FILE=docker-compose.dev.yml
-fi
+setDockerComposeFile() {
+    DOCKER_COMPOSE_FILE=docker-compose.yml
 
-dockerCompose() {
-    docker-compose --project-directory "${SCRIPTPATH}" -f "${SCRIPTPATH}/${DOCKER_COMPOSE_FILE}" "${@:1}"
+    # Symfony
+    APP_ENV=${APP_ENV:-}
+    if [ "${APP_ENV}" == "dev" ]; then
+        DOCKER_COMPOSE_FILE=docker-compose.dev.yml
+    fi
+
+    # TYPO3
+    TYPO3_CONTEXT=${TYPO3_CONTEXT:-}
+    if [ "${TYPO3_CONTEXT:0:11}" == "Development" ]; then
+        DOCKER_COMPOSE_FILE=docker-compose.dev.yml
+    fi
+
+    # Custom
+    ENV_DOCKER_CONTEXT=${ENV_DOCKER_CONTEXT:-}
+    if [ "${ENV_DOCKER_CONTEXT:0:11}" == "Development" ]; then
+        DOCKER_COMPOSE_FILE=docker-compose.dev.yml
+    fi
+}
+
+dockerComposeCmd() {
+    docker-compose -f "${DOCKER_COMPOSE_FILE}" "${@:1}"
 }
 
 checkRoot() {
@@ -53,14 +71,6 @@ checkGit() {
     fi
 }
 
-askDeploy() {
-    read -p 'Deploy? [y/N] ' -n 1 -r
-    echo
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        [[ "$0" = "$BASH_SOURCE" ]] && exit 1 || return 1 # handle exits from shell or function but don't exit interactive shell
-    fi
-}
-
 setPermissions() {
     chown -R ${APPLICATION_UID}:${APPLICATION_GID} .
     find . -type d -exec chmod ugo+rx,ug+w {} \;
@@ -77,7 +87,6 @@ runDeploy() {
     # Deploy as user in container
     startFunction start
     startFunction exec-web composer install
-    #startFunction exec-web composer --working-dir=public install --ignore-platform-reqs
 
     # Update database schema
     read -p 'Update database schema? [y/N] ' -n 1 -r
@@ -91,6 +100,9 @@ runDeploy() {
     startFunction exec-web /app/bin/console cache:warmup
 }
 
+loadEnvironmentVariables
+setDockerComposeFile
+
 startFunction() {
     case ${1} in
         start)
@@ -99,35 +111,34 @@ startFunction() {
             startFunction up
         ;;
         up)
-            dockerCompose up -d
+            dockerComposeCmd up -d
         ;;
         down)
-            dockerCompose down --remove-orphans
+            dockerComposeCmd down --remove-orphans
         ;;
         login-root)
-            dockerCompose exec web bash
+            dockerComposeCmd exec web bash
         ;;
         login)
             startFunction bash
         ;;
         bash)
-            dockerCompose exec -u ${APPLICATION_USER} web bash
+            dockerComposeCmd exec -u ${APPLICATION_USER} web bash
         ;;
         zsh)
-            dockerCompose exec -u ${APPLICATION_USER} web zsh
+            dockerComposeCmd exec -u ${APPLICATION_USER} web zsh
         ;;
         exec-web)
-            dockerCompose exec -u ${APPLICATION_USER} web "${@:2}"
+            dockerComposeCmd exec -u ${APPLICATION_USER} web "${@:2}"
         ;;
         deploy)
             checkRoot
             checkGitMaster
             checkGit
-            askDeploy
             runDeploy
         ;;
         *)
-            dockerCompose "${@:1}"
+            dockerComposeCmd "${@:1}"
         ;;
     esac
 }
