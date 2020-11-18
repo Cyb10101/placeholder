@@ -56,4 +56,3 @@ ${BIN_PHP} ${BIN_COMPOSER} install
 symfonyUpdateDatabase
 symfonyClearCache
 
-
