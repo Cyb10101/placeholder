@@ -32,6 +32,12 @@ setDockerComposeFile() {
         DOCKER_COMPOSE_FILE=docker-compose.dev.yml
     fi
 
+    # TYPO3
+    WP_ENVIRONMENT_TYPE=${WP_ENVIRONMENT_TYPE:-}
+    if [ "${WP_ENVIRONMENT_TYPE:0:11}" == "development" ]; then
+        DOCKER_COMPOSE_FILE=docker-compose.dev.yml
+    fi
+
     # Custom
     ENV_DOCKER_CONTEXT=${ENV_DOCKER_CONTEXT:-}
     if [ "${ENV_DOCKER_CONTEXT:0:11}" == "Development" ]; then
@@ -50,23 +56,27 @@ checkRoot() {
     fi
 }
 
-checkGitMaster() {
-    if [[ $(git symbolic-ref --short -q HEAD) != 'master' ]]; then
-        echo 'ERROR: Git is not on branch master!'
-        [[ "$0" = "$BASH_SOURCE" ]] && exit 1 || return 1 # handle exits from shell or function but don't exit interactive shell
+gitCheckBranch() {
+    if [ -d ".git" ]; then
+        if [[ $(git symbolic-ref --short -q HEAD) != "${1}" ]]; then
+            echo "ERROR: Git is not on branch ${1}!"
+            [[ "$0" = "$BASH_SOURCE" ]] && exit 1 || return 1 # handle exits from shell or function but don't exit interactive shell
+        fi
     fi
 }
 
-checkGit() {
-    if [[ $(git diff --stat) != '' ]]; then
-        echo
-        git status --porcelain
-        echo
+gitCheckDirty() {
+    if [ -d ".git" ]; then
+        if [[ $(git diff --stat) != '' ]]; then
+            echo
+            git status --porcelain
+            echo
 
-        read -p 'Git is dirty... Continue? [y/N] ' -n 1 -r
-        echo
-        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-            [[ "$0" = "$BASH_SOURCE" ]] && exit 1 || return 1 # handle exits from shell or function but don't exit interactive shell
+            read -p 'Git is dirty... Continue? [y/N] ' -n 1 -r
+            echo
+            if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+                [[ "$0" = "$BASH_SOURCE" ]] && exit 1 || return 1 # handle exits from shell or function but don't exit interactive shell
+            fi
         fi
     fi
 }
@@ -77,30 +87,58 @@ setPermissions() {
     find . -type f -exec chmod ugo+r,ug+w {} \;
 }
 
+gitPullHost() {
+    if [ -d ".git" ]; then
+        git pull "${@:1}"
+    fi
+}
+
+gitPullGuest() {
+    if [ -d ".git" ]; then
+        startFunction exec-web git pull "${@:1}"
+    fi
+}
+
+composerInstall() {
+    if [ -f "composer.json" ]; then
+        startFunction exec-web composer install "${@:1}"
+    fi
+}
+
+symfonyUpdateDatabase() {
+    if [ -f "symfony.lock" ]; then
+        read -p 'Update database schema? [y/N] ' -n 1 -r
+        echo
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            startFunction exec-web ./bin/console doctrine:schema:update --force
+        fi
+    fi
+}
+
+symfonyClearCache() {
+    if [ -f "symfony.lock" ]; then
+        startFunction exec-web ./bin/console cache:clear --no-warmup
+        startFunction exec-web ./bin/console cache:warmup
+    fi
+}
+
 runDeploy() {
-    git pull origin master
+    gitPullHost origin ${GIT_BRANCH}
     setPermissions
 
     # Git: Deploy as user in container (SSH-Key for private repositories needed)
-    #startFunction exec-web git pull origin master
+    #gitPullGuest origin ${GIT_BRANCH}
 
     # Deploy as user in container
     startFunction start
-    startFunction exec-web composer install
+    composerInstall
 
-    # Update database schema
-    read -p 'Update database schema? [y/N] ' -n 1 -r
-    echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        startFunction exec-web /app/bin/console doctrine:schema:update --force
-    fi
-
-    # Clear cache
-    startFunction exec-web /app/bin/console cache:clear --no-warmup
-    startFunction exec-web /app/bin/console cache:warmup
+    symfonyUpdateDatabase
+    symfonyClearCache
 }
 
 loadEnvironmentVariables
+GIT_BRANCH="${GIT_BRANCH:-master}"
 setDockerComposeFile
 
 startFunction() {
@@ -133,8 +171,8 @@ startFunction() {
         ;;
         deploy)
             checkRoot
-            checkGitMaster
-            checkGit
+            gitCheckBranch ${GIT_BRANCH}
+            gitCheckDirty
             runDeploy
         ;;
         *)
