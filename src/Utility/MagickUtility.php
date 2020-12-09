@@ -1,47 +1,23 @@
 <?php
 namespace App\Utility;
 
-/**
- * Class MagickUtility
- *
- * @author Thomas Schur <cyb10101@gmail.com>
- */
 class MagickUtility extends Singleton {
-    /**
-     * @var string
-     */
-    protected $binaryGmagick = '/usr/bin/gm';
+    protected string $binaryGmagick = '/usr/bin/gm';
+    protected string $binaryConvertImagick = '/usr/bin/convert';
+    protected bool $existsMagick = false;
+    protected bool $existsGraphicMagick = false;
+    protected bool $existsImageMagick = false;
+    protected array $stacks = [];
+    protected string $lastCommand = '';
 
-    /**
-     * @var string
-     */
-    protected $binaryConvertImagick = '/usr/bin/convert';
-
-    /**
-     * @var bool
-     */
-    protected $existsGraphicMagick = null;
-
-    /**
-     * @var bool
-     */
-    protected $existsImageMagick = null;
-
-    /**
-     * @var array
-     */
-    protected $stacks = [];
-
-    /**
-     * @var string
-     */
-    protected $lastCommand = '';
-
-    /**
-     * @return MagickUtility
-     */
     public static function getInstance(): MagickUtility {
         return parent::getInstance();
+    }
+
+    public function initializeInstance() {
+        if (!$this->isMagick()) {
+            throw new \Exception('Magick not found');
+        }
     }
 
     /**
@@ -59,11 +35,14 @@ class MagickUtility extends Singleton {
      * @return bool
      */
     public function existsGraphicMagick(): bool {
-        if (is_null($this->existsGraphicMagick)) {
+        if (!$this->existsMagick) {
             $output = null;
             $return = null;
-            exec('gm -version >/dev/null 2>&1', $output, $return);
+            exec($this->binaryGmagick . ' -version', $output, $return);
             $this->existsGraphicMagick = ($return === 0);
+            if ($this->existsGraphicMagick) {
+                $this->existsMagick = true;
+            }
         }
         return $this->existsGraphicMagick;
     }
@@ -74,11 +53,14 @@ class MagickUtility extends Singleton {
      * @return bool
      */
     public function existsImageMagick(): bool {
-        if (is_null($this->existsImageMagick)) {
+        if (!$this->existsMagick) {
             $output = null;
             $return = null;
-            exec('identify -version >/dev/null 2>&1', $output, $return);
+            exec($this->binaryConvertImagick . ' -version >/dev/null 2>&1', $output, $return);
             $this->existsImageMagick = ($return === 0);
+            if ($this->existsImageMagick) {
+                $this->existsMagick = true;
+            }
         }
         return $this->existsImageMagick;
     }
@@ -110,9 +92,9 @@ class MagickUtility extends Singleton {
     }
 
     /**
-     * @return string
+     * @return self
      */
-    public function clearStacks(): string {
+    public function clearStacks(): self {
         $this->stacks = [];
         return $this;
     }
@@ -139,7 +121,7 @@ class MagickUtility extends Singleton {
      */
     public function addInputFile(string $inputFile): MagickUtility {
         $this->addStacks([
-            $inputFile
+            '"' . $inputFile . '"',
         ]);
         return $this;
     }
@@ -150,7 +132,18 @@ class MagickUtility extends Singleton {
      */
     public function addOutputFile(string $outputFile): MagickUtility {
         $this->addStacks([
-            $outputFile
+            '"' . $outputFile . '"',
+        ]);
+        return $this;
+    }
+
+    /**
+     * @param int $quality
+     * @return MagickUtility
+     */
+    public function quality(int $quality): MagickUtility {
+        $this->addStacks([
+            '-quality ' . $quality,
         ]);
         return $this;
     }
@@ -259,17 +252,6 @@ class MagickUtility extends Singleton {
             '-thumbnail ' . $width . 'x' . $height . '^',
             '-gravity center',
             '-extent ' . $width . 'x' . $height
-        ]);
-        return $this;
-    }
-
-    /**
-     * @param int $quality
-     * @return MagickUtility
-     */
-    public function quality(int $quality): MagickUtility {
-        $this->addStacks([
-            '-quality ' . $quality,
         ]);
         return $this;
     }
