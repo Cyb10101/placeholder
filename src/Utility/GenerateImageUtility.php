@@ -71,7 +71,7 @@ class GenerateImageUtility {
         $this->magickUtility
             ->drawBorder($this->imageConfiguration->getBorder(), $this->imageConfiguration->getForegroundColor())
             ->addOutputFile($this->getCachedFilename())
-            ->execute();
+            ->convert();
         return $this;
     }
 
@@ -93,7 +93,7 @@ class GenerateImageUtility {
             $this->magickUtility
                 ->drawBorder($this->imageConfiguration->getBorder(), $this->imageConfiguration->getForegroundColor())
                 ->addOutputFile($this->getCachedFilename())
-                ->execute();
+                ->convert();
         }
         return $this;
     }

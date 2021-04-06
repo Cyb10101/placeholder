@@ -3,7 +3,7 @@ namespace App\Utility;
 
 class MagickUtility extends Singleton {
     protected string $binaryGmagick = '/usr/bin/gm';
-    protected string $binaryConvertImagick = '/usr/bin/convert';
+    protected string $binaryConvertImagick = '/usr/bin/magick';
     protected bool $existsMagick = false;
     protected bool $existsGraphicMagick = false;
     protected bool $existsImageMagick = false;
@@ -138,6 +138,16 @@ class MagickUtility extends Singleton {
     }
 
     /**
+     * @return MagickUtility
+     */
+    public function autoOrient(): MagickUtility {
+        $this->addStacks([
+            '-auto-orient',
+        ]);
+        return $this;
+    }
+
+    /**
      * @param int $quality
      * @return MagickUtility
      */
@@ -260,27 +270,47 @@ class MagickUtility extends Singleton {
         throw new \Exception('Command not working: ' . PHP_EOL . $this->lastCommand);
     }
 
+    protected function stacksToString(): string {
+        $command = '';
+        foreach ($this->stacks as $stack) {
+            $command .= ' ' . implode(' ', $stack);
+        }
+        return trim($command);
+    }
+
     /**
-     * @param array $commands
      * @return bool
      */
-    public function execute(): bool {
-        $output = null;
-        $return = null;
-
-        $command = '';
-        if (empty($commands)) {
-            foreach ($this->stacks as $stack) {
-                $command .= ' ' . implode(' ', $stack);
-            }
-            $command = trim($command);
-        }
+    public function convert(): bool {
+        $command = $this->stacksToString();
 
         if ($this->existsGraphicMagick()) {
             $command = $this->binaryGmagick . ' convert ' . $command;
         } else if ($this->existsImageMagick()) {
-            $command = $this->binaryConvertImagick . ' ' . $command;
+            $command = $this->binaryConvertImagick . ' convert ' . $command;
         }
+
+        return $this->execute($command);
+    }
+
+    /**
+     * @return bool
+     */
+    public function mogrify(): bool {
+        $command = $this->stacksToString();
+
+        if ($this->existsGraphicMagick()) {
+            $command = $this->binaryGmagick . ' mogrify ' . $command;
+        } else if ($this->existsImageMagick()) {
+            $command = $this->binaryConvertImagick . ' mogrify ' . $command;
+        }
+
+        return $this->execute($command);
+    }
+
+    protected function execute(string $command): bool {
+        $output = null;
+        $return = null;
 
         if ($this->isMagick()) {
             $this->lastCommand = $command;
