@@ -1,5 +1,7 @@
 # Netslum: Placeholder
 
+This project is archived.
+
 ## Create Project
 
 ```bash
